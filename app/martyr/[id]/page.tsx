@@ -10,7 +10,7 @@ import { ArrowLeft, Calendar, MapPin, Heart, Play, Pause, Volume2, Share2, Downl
 import Image from "next/image"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import martyrData from '@/data/martyrs.json'
+//import martyrData from '@/data/martyrs.json'
 
 interface Martyr {
   id: string
