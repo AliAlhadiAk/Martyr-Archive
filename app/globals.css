@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-adoody: 'Adoody';
+  --font-mj-ghalam: 'MjGhalam';
+  --font-dg-mataryah: 'DGMataryah';
+  --font-entezar5: 'Entezar5';
+  --font-entezar2: 'Entezar2';
+  --font-foda: 'Foda';
+  --font-abuhmeda: 'Abuhmeda';
+  --font-dg-tofan-alaqsa: 'DGTofanAlaqsa';
+  --font-dima-shakasta: 'DimaShakasta';
+  --font-hadye-hadye: 'HadyeHadye';
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-dg-mataryah), Arial, sans-serif;
+  direction: rtl;
+}
+
+/* Font utility classes */
+.font-adoody {
+  font-family: var(--font-adoody);
+}
+
+.font-mj-ghalam {
+  font-family: var(--font-mj-ghalam);
+}
+
+.font-dg-mataryah {
+  font-family: var(--font-dg-mataryah);
+}
+
+.font-entezar5 {
+  font-family: var(--font-entezar5);
+}
+
+.font-entezar2 {
+  font-family: var(--font-entezar2);
+}
+
+.font-foda {
+  font-family: var(--font-foda);
+}
+
+.font-abuhmeda {
+  font-family: var(--font-abuhmeda);
+}
+
+.font-dg-tofan-alaqsa {
+  font-family: var(--font-dg-tofan-alaqsa);
+}
+
+.font-dima-shakasta {
+  font-family: var(--font-dima-shakasta);
+}
+
+.font-hadye-hadye {
+  font-family: var(--font-hadye-hadye);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #ef4444, #dc2626);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #dc2626, #b91c1c);
+}
