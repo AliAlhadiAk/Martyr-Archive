@@ -25,20 +25,65 @@ const initializeAdminAssets = () => {
   }
 }
 
-export async function GET() {
+// Add specific GET route for individual martyrs
+export async function GET(req: NextRequest) {
   try {
     initializeAdminAssets()
     const fileContents = fs.readFileSync(ADMIN_ASSETS_FILE, 'utf8')
     const data = JSON.parse(fileContents)
     
-    // Return only the martyrs array from the admin assets
-    // Ensure it's an array, default to empty if not
-    const martyrs = Array.isArray(data.martyrs) ? data.martyrs : [];
-
-    return NextResponse.json({ martyrs })
+    const url = new URL(req.url)
+    const idMatch = url.pathname.match(/\/api\/martyrs\/(.+)/)
+    
+    // Debug logging
+    console.log('Request URL:', req.url)
+    console.log('URL pathname:', url.pathname)
+    console.log('ID Match:', idMatch)
+    console.log('Available martyrs:', {
+      count: data.martyrs?.length,
+      ids: data.martyrs?.map((m: any) => ({ id: m.id, type: typeof m.id }))
+    })
+    
+    if (idMatch) {
+      const martyrId = idMatch[1]
+      console.log('Looking for martyr ID:', martyrId, 'Type:', typeof martyrId)
+      
+      // Ensure consistent type comparison and trim any whitespace
+      const martyr = data.martyrs?.find((m: any) => 
+        String(m.id).trim() === String(martyrId).trim()
+      )
+      
+      console.log('Found martyr:', martyr ? 'Yes' : 'No')
+      
+      if (!martyr) {
+        console.log('Available IDs for comparison:', 
+          data.martyrs?.map((m: any) => ({
+            id: m.id,
+            stringId: String(m.id),
+            type: typeof m.id
+          }))
+        )
+        return NextResponse.json(
+          { 
+            error: 'Martyr not found',
+            requestedId: martyrId,
+            availableIds: data.martyrs?.map((m: any) => m.id)
+          }, 
+          { status: 404 }
+        )
+      }
+      
+      return NextResponse.json(martyr)
+    }
+    
+    return NextResponse.json({ martyrs: data.martyrs || [] })
   } catch (error) {
-    console.error('Error reading martyrs data from admin assets:', error)
-    return NextResponse.json({ martyrs: [] }, { status: 500 })
+    console.error('API Error:', error)
+    console.error('Stack:', error.stack)
+    return NextResponse.json(
+      { error: 'Failed to fetch martyrs', details: error.message }, 
+      { status: 500 }
+    )
   }
 }
 

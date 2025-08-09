@@ -8,7 +8,9 @@
       "category": "العناوين الرئيسية",
       "weight": "Bold",
       "size": "2.4 MB",
-      "formats": ["TTF"],
+      "formats": [
+        "TTF"
+      ],
       "preview": "الشهداء أحياء عند ربهم يرزقون",
       "description": "خط فاخر مصمم خصيصاً للعناوين الرئيسية والشعارات التذكارية",
       "downloads": 15420,
@@ -19,6 +21,28 @@
       "downloadUrl": "/fonts/adoody.ttf",
       "createdAt": "2024-01-15T10:30:00Z",
       "createdBy": "admin"
+    },
+    {
+      "id": 1754734552328,
+      "downloads": 0,
+      "createdAt": "2025-08-09T10:15:52.328Z",
+      "createdBy": "admin",
+      "name": "Entezar",
+      "englishName": "asdasd",
+      "fileName": "alfont_com_adoody (1).ttf",
+      "category": "العناوين الفرعية",
+      "weight": "Medium",
+      "description": "asdasdasd",
+      "premium": true,
+      "gradient": "asdda",
+      "fontFamily": "sadasd",
+      "size": "0.1 MB",
+      "formats": [
+        "TTF"
+      ],
+      "preview": "الشهداء أحياء عند ربهم يرزقون",
+      "rating": 4.5,
+      "downloadUrl": "/fonts/alfont_com_adoody (1).ttf"
     }
   ],
   "designs": [
@@ -30,9 +54,17 @@
       "preview": "/placeholder.svg?height=300&width=200&text=بطاقة+كلاسيكية",
       "description": "تصميم كلاسيكي أنيق للبطاقات التذكارية",
       "downloads": 1250,
-      "formats": ["PSD", "AI", "PNG"],
+      "formats": [
+        "PSD",
+        "AI",
+        "PNG"
+      ],
       "size": "15.2 MB",
-      "tags": ["كلاسيكي", "بطاقة", "تذكاري"],
+      "tags": [
+        "كلاسيكي",
+        "بطاقة",
+        "تذكاري"
+      ],
       "createdAt": "2024-01-10T14:20:00Z",
       "createdBy": "admin"
     }
@@ -45,9 +77,17 @@
       "preview": "/placeholder.svg?height=400&width=300&text=بوستر+الذكرى",
       "description": "بوستر تذكاري للمناسبات الخاصة",
       "downloads": 890,
-      "formats": ["PSD", "AI", "JPG"],
+      "formats": [
+        "PSD",
+        "AI",
+        "JPG"
+      ],
       "size": "28.7 MB",
-      "tags": ["ذكرى", "بوستر", "مناسبة"],
+      "tags": [
+        "ذكرى",
+        "بوستر",
+        "مناسبة"
+      ],
       "createdAt": "2024-01-08T16:45:00Z",
       "createdBy": "admin"
     }
@@ -60,9 +100,17 @@
       "preview": "/placeholder.svg?height=200&width=200&text=أيقونات",
       "description": "مجموعة من الأيقونات التذكارية",
       "downloads": 2340,
-      "formats": ["SVG", "PNG", "AI"],
+      "formats": [
+        "SVG",
+        "PNG",
+        "AI"
+      ],
       "size": "5.8 MB",
-      "tags": ["أيقونات", "رموز", "تذكاري"],
+      "tags": [
+        "أيقونات",
+        "رموز",
+        "تذكاري"
+      ],
       "createdAt": "2024-01-05T09:15:00Z",
       "createdBy": "admin"
     }
@@ -75,10 +123,18 @@
       "preview": "/placeholder.svg?height=300&width=400&text=فيديو+تعريفي",
       "description": "فيديو تعريفي شامل للأرشيف الرقمي",
       "downloads": 567,
-      "formats": ["MP4", "MOV", "AVI"],
+      "formats": [
+        "MP4",
+        "MOV",
+        "AVI"
+      ],
       "size": "125 MB",
       "duration": "3:45",
-      "tags": ["تعريفي", "أرشيف", "شرح"],
+      "tags": [
+        "تعريفي",
+        "أرشيف",
+        "شرح"
+      ],
       "createdAt": "2024-01-03T11:30:00Z",
       "createdBy": "admin"
     }
@@ -91,12 +147,36 @@
       "preview": "/placeholder.svg?height=200&width=300&text=موسيقى+تصويرية",
       "description": "موسيقى تصويرية هادئة للخلفيات",
       "downloads": 1890,
-      "formats": ["MP3", "WAV", "FLAC"],
+      "formats": [
+        "MP3",
+        "WAV",
+        "FLAC"
+      ],
       "size": "12.4 MB",
       "duration": "4:20",
-      "tags": ["موسيقى", "هادئة", "خلفية"],
+      "tags": [
+        "موسيقى",
+        "هادئة",
+        "خلفية"
+      ],
       "createdAt": "2024-01-01T08:00:00Z",
       "createdBy": "admin"
+    }
+  ],
+  "martyrs": [
+    {
+      "id": 1754732848815,
+      "downloads": 0,
+      "createdAt": "2025-08-09T09:47:28.815Z",
+      "createdBy": "admin",
+      "name": "asdasd",
+      "age": 22,
+      "location": "asdasd",
+      "martyrdomDate": "",
+      "story": "asdasd",
+      "testament": "asdasdasd",
+      "image": "/placeholder.svg?height=400&width=300&text=asdasd",
+      "audioUrl": "/audio/placeholder.mp3"
     }
   ]
 }
