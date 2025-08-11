@@ -14,14 +14,13 @@ async function getMartyr(id: string) {
   return res.json()
 }
 
-export async function generateMetadata({ 
-  params 
-}: { 
-  params: Promise<{ id: string }> 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
 }): Promise<Metadata> {
-  // Await the params object
-  const resolvedParams = await params
-  const martyr = await getMartyr(resolvedParams.id)
+  const { id } = await params
+  const martyr = await getMartyr(id)
   
   return {
     title: martyr ? `الشهيد ${martyr.name}` : 'الشهيد غير موجود',
@@ -32,14 +31,13 @@ export async function generateMetadata({
   }
 }
 
-export default async function MartyrPage({ 
-  params 
-}: { 
-  params: Promise<{ id: string }> 
+export default async function MartyrPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
 }) {
-  // Await the params object
-  const resolvedParams = await params
-  const martyr = await getMartyr(resolvedParams.id)
+  const { id } = await params
+  const martyr = await getMartyr(id)
 
   if (!martyr) {
     return (

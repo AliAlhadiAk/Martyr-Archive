@@ -6,18 +6,19 @@ import { InteractiveMartyrCardFixed } from "./interactive-martyr-card-fixed"
 import { Plus, Heart, Users, Calendar } from 'lucide-react'
 // Removed: import martyrData from '@/data/martyrs.json'
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useMemo } from "react"
+import { useMartyrs } from "@/hooks/use-martyrs"
 
 interface Martyr {
-  id: string;
-  name: string;
-  age: number;
-  location: string;
-  martyrdomDate: string; // Or 'date' depending on your API response
-  image: string;
-  story: string;
-  testament: string;
-  audioUrl: string;
+  id: string
+  name: string
+  age: number
+  location: string
+  martyrdomDate: string
+  image: string
+  story: string
+  testament: string
+  audioUrl: string
 }
 
 const containerVariants = {
@@ -45,41 +46,21 @@ const titleVariants = {
 }
 
 export function MemoryWallFixed() {
-  const [martyrs, setMartyrs] = useState<Martyr[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const fetchMartyrs = async () => {
-      try {
-        setIsLoading(true)
-        const response = await fetch('/api/martyrs')
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const data = await response.json()
-        // Ensure the data structure matches the Martyr interface
-        const fetchedMartyrs: Martyr[] = data.martyrs.map((martyr: any) => ({
-          id: martyr.id,
-          name: martyr.name,
-          age: martyr.age,
-          location: martyr.location,
-          martyrdomDate: martyr.martyrdomDate || martyr.date, // Use martyrdomDate or fallback to date
-          image: martyr.image,
-          story: martyr.story,
-          testament: martyr.testament,
-          audioUrl: martyr.audioUrl,
-        }))
-        setMartyrs(fetchedMartyrs)
-      } catch (e: any) {
-        setError(e.message)
-        console.error("Failed to fetch martyrs for Memory Wall:", e)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    fetchMartyrs()
-  }, [])
+  const { data, isLoading, error } = useMartyrs()
+  const martyrs: Martyr[] = useMemo(() => {
+    const list = (data && 'martyrs' in data ? data.martyrs : []) as any[]
+    return list.map((m) => ({
+      id: String(m.id),
+      name: m.name,
+      age: Number(m.age ?? 0),
+      location: m.location ?? '',
+      martyrdomDate: m.martyrdomDate || m.date || '',
+      image: m.image || '/placeholder.svg',
+      story: m.story || '',
+      testament: m.testament || '',
+      audioUrl: m.audioUrl || ''
+    }))
+  }, [data])
 
   if (isLoading) {
     return (
@@ -92,7 +73,7 @@ export function MemoryWallFixed() {
   if (error) {
     return (
       <section className="py-20 bg-gradient-to-b from-gray-900 via-black to-gray-900 relative overflow-hidden flex items-center justify-center min-h-screen">
-        <div className="text-red-500 text-2xl">Error loading memory wall: {error}</div>
+        <div className="text-red-500 text-2xl">Error loading memory wall</div>
       </section>
     )
   }

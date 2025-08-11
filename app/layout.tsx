@@ -1,7 +1,4 @@
-"use client"
-
 import { ReactNode } from 'react'
-import type { Metadata } from 'next'
 import {
   adoody,
   mjGhalam,
@@ -14,16 +11,12 @@ import {
   dimaShakasta,
   hadyeHadye,
 } from './fonts'
-import { ClientLayout } from './client-layout'
+import { Providers } from './providers'
 import './globals.css'
 
 
 
-export default function RootLayout({
-  children,
-}: {
-  children: ReactNode
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   const fontClasses = `
     ${adoody.variable} 
     ${mjGhalam.variable} 
@@ -38,8 +31,10 @@ export default function RootLayout({
   `
 
   return (
-    <ClientLayout className={fontClasses}>
-      {children}
-    </ClientLayout>
+    <html lang="ar" dir="rtl" className={fontClasses}>
+      <body className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+        <Providers>{children}</Providers>
+      </body>
+    </html>
   )
 }

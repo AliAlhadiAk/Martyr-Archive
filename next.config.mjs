@@ -1,12 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    // Enforce linting in CI/builds for higher code quality
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    // Fail builds on type errors to increase reliability
+    ignoreBuildErrors: false,
   },
   images: {
+    // Keep unoptimized until remote domains are configured
     unoptimized: true,
   },
 }

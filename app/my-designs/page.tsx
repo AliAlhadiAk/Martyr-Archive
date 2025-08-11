@@ -90,7 +90,7 @@ const sortOptions = [
   { label: "الاسم", value: "name" }
 ]
 
-export default function MyDesignsPage() {
+export default function DesignsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("الكل")
   const [selectedStatus, setSelectedStatus] = useState("الكل")
@@ -180,12 +180,12 @@ export default function MyDesignsPage() {
             className="text-center mb-16"
           >
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 font-adoody">
-              تصميماتي
+              التصاميم
             </h1>
             <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-red-700 mx-auto mb-6 rounded-full" />
-            <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed font-entezar-new">
-              إدارة وتنظيم جميع تصاميمك التذكارية في مكان واحد
-            </p>
+              <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed font-entezar-new">
+                مكتبة التصاميم التذكارية المنظمة حسب القوالب والفئات
+              </p>
             
             {/* Stats */}
             <div className="flex justify-center items-center gap-8 mt-8 text-white/70">

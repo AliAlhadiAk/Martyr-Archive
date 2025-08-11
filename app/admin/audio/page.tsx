@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AudioUpload } from "@/components/admin/audio-upload"
@@ -17,6 +17,24 @@ interface AudioFile {
 
 export default function AudioManagementPage() {
   const [audioFiles, setAudioFiles] = useState<AudioFile[]>([])
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch('/api/media-kit/audio')
+        if (!res.ok) return
+        const data = await res.json()
+        const mapped: AudioFile[] = (data.audioFiles ?? []).map((a: any) => ({
+          id: a.id,
+          title: a.title,
+          url: a.url,
+          createdAt: new Date().toISOString(),
+        }))
+        setAudioFiles(mapped)
+      } catch {}
+    }
+    load()
+  }, [])
 
   const handleDelete = async (id: string) => {
     if (!confirm('هل أنت متأكد من حذف هذا الملف الصوتي؟')) return

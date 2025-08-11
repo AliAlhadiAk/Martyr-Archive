@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ResponsiveNavbar } from "@/components/responsive-navbar";
 import { SharedBackground } from "@/components/shared-background";
@@ -22,6 +22,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
+import { useMartyrs } from "@/hooks/use-martyrs";
+import { useDebounce } from "@/hooks/use-debounce";
 
 const months = [
   "يناير",
@@ -49,21 +51,14 @@ const weekDays = [
 ];
 
 const CalendarPage = () => {
-  const [martyrs, setMartyrs] = useState([]);
-
-  useEffect(() => {
-    fetch("/api/martyrs")
-      .then((res) => res.json())
-      .then((data) => {
-        // Convert date strings to Date objects
-        const parsedMartyrs = (data.martyrs ?? []).map((martyr: any) => ({
-          ...martyr,
-          date: new Date(martyr.date),
-        }));
-        setMartyrs(parsedMartyrs);
-      })
-      .catch((err) => console.error("Failed to fetch martyrs:", err));
-  }, []);
+  const { data } = useMartyrs();
+  const martyrs = useMemo(() => {
+    const list = (data && "martyrs" in data ? (data as any).martyrs : []) as any[];
+    return list.map((m) => ({
+      ...m,
+      date: new Date(m.martyrdomDate || m.date || new Date().toISOString()),
+    }));
+  }, [data]);
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -71,6 +66,7 @@ const CalendarPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
@@ -80,10 +76,10 @@ const CalendarPage = () => {
     const martyrsMap = new Map<string, typeof martyrs>();
 
     const filteredMartyrs = martyrs.filter((martyr) =>
-      searchQuery === ""
+      debouncedSearchQuery === ""
         ? true
-        : martyr.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          martyr.location.toLowerCase().includes(searchQuery.toLowerCase())
+        : martyr.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+          martyr.location?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
     );
 
     filteredMartyrs.forEach((martyr) => {
@@ -110,7 +106,7 @@ const CalendarPage = () => {
     });
 
     return martyrsMap;
-  }, [currentYear, currentMonth, viewMode, searchQuery]);
+  }, [martyrs, currentYear, currentMonth, viewMode, debouncedSearchQuery]);
 
   // Get selected date martyrs
   const selectedDateMartyrs = useMemo(() => {
@@ -121,12 +117,12 @@ const CalendarPage = () => {
         martyr.date.getDate() === selectedDate.getDate() &&
         martyr.date.getMonth() === selectedDate.getMonth() &&
         martyr.date.getFullYear() === selectedDate.getFullYear() &&
-        (searchQuery === ""
+        (debouncedSearchQuery === ""
           ? true
-          : martyr.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            martyr.location.toLowerCase().includes(searchQuery.toLowerCase()))
+          : martyr.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+            martyr.location?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
     );
-  }, [selectedDate, searchQuery]);
+  }, [martyrs, selectedDate, debouncedSearchQuery]);
 
   // Generate calendar days for month view
   const calendarDays = useMemo(() => {
@@ -727,14 +723,22 @@ const CalendarPage = () => {
                       </h4>
                       <div className="space-y-2">
                         {(() => {
-                          const locationCounts = Array.from(martyrsByDate.values())
+                          const locationCounts: Record<string, number> = Array.from(
+                            martyrsByDate.values()
+                          )
                             .flat()
-                            .reduce((acc, martyr) => {
-                              acc[martyr.location] = (acc[martyr.location] || 0) + 1;
-                              return acc;
-                            }, {} as Record<string, number>);
+                            .reduce((acc: Record<string, number>, martyr: any) => {
+                              const key = String(martyr.location ?? "غير معروف")
+                              acc[key] = (acc[key] ?? 0) + 1
+                              return acc
+                            }, {})
 
-                          return Object.entries(locationCounts)
+                          const entries = Object.entries(locationCounts) as Array<[
+                            string,
+                            number
+                          ]>
+
+                          return entries
                             .sort(([, a], [, b]) => b - a)
                             .slice(0, 3)
                             .map(([location, count], index) => (
@@ -750,7 +754,7 @@ const CalendarPage = () => {
                                   {location}
                                 </span>
                                 <Badge className="bg-red-600/20 text-red-300 border-red-500/30 font-dg-mataryah">
-                                  {count}
+                                  {Number(count)}
                                 </Badge>
                               </motion.div>
                             ));

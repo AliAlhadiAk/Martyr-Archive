@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useMemo } from "react"
+import { useMartyrs } from "@/hooks/use-martyrs"
+import { useDebounce } from "@/hooks/use-debounce"
 import { motion } from "framer-motion"
 import { ResponsiveNavbar } from "@/components/responsive-navbar"
 import { InteractiveMartyrCardFixed } from "@/components/interactive-martyr-card-fixed"
@@ -12,20 +14,35 @@ import { Search, Filter, Users, MapPin, Calendar, SortAsc, SortDesc, Grid, List 
 
 // Define Martyr type to match the expected structure from the API
 interface Martyr {
-  id: number;
-  name: string;
-  age: number;
-  location: string;
-  date: string; // Changed from martyrdomDate to date to match the display logic
-  image: string;
-  story: string;
-  testament: string;
-  audioUrl: string;
+  id: number
+  name: string
+  age: number
+  location: string
+  date: string
+  image: string
+  story: string
+  testament: string
+  audioUrl: string
 }
 
 export default function MartyrsPage() {
-  const [martyrs, setMartyrs] = useState<Martyr[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { data, isLoading, error } = useMartyrs()
+  const martyrs: Martyr[] = useMemo(() => {
+    const list = (data && 'martyrs' in data ? data.martyrs : []) as any[]
+    return Array.isArray(list)
+      ? list.map((martyr: any) => ({
+          id: Number(martyr.id),
+          name: martyr.name,
+          age: Number(martyr.age ?? 0),
+          location: martyr.location ?? '',
+          date: martyr.martyrdomDate || martyr.date || '',
+          image: martyr.image || "/placeholder.svg?height=400&width=300&text=صورة+الشهيد",
+          story: martyr.story || '',
+          testament: martyr.testament || '',
+          audioUrl: martyr.audioUrl || "/audio/placeholder.mp3",
+        }))
+      : []
+  }, [data])
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLocation, setSelectedLocation] = useState("all")
   const [selectedAgeRange, setSelectedAgeRange] = useState("all")
@@ -34,41 +51,9 @@ export default function MartyrsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 12
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
-  // Fetch martyrs data dynamically
-  useEffect(() => {
-    const fetchMartyrs = async () => {
-      setIsLoading(true)
-      try {
-        const response = await fetch('/api/martyrs')
-        if (response.ok) {
-          const data = await response.json()
-          // Ensure data.martyrs is an array and map martyrdomDate to date
-          const fetchedMartyrs = Array.isArray(data.martyrs) ? data.martyrs.map((martyr: any) => ({
-            id: parseInt(martyr.id),
-            name: martyr.name,
-            age: parseInt(martyr.age),
-            location: martyr.location,
-            date: martyr.martyrdomDate || martyr.date, // Use martyrdomDate if available, else date
-            image: martyr.image || "/placeholder.svg?height=400&width=300&text=صورة+الشهيد",
-            story: martyr.story,
-            testament: martyr.testament,
-            audioUrl: martyr.audioUrl || "/audio/placeholder.mp3",
-          })) : [];
-          setMartyrs(fetchedMartyrs)
-        } else {
-          console.error("Failed to fetch martyrs:", response.statusText)
-          setMartyrs([])
-        }
-      } catch (error) {
-        console.error("Error fetching martyrs:", error)
-        setMartyrs([])
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    fetchMartyrs()
-  }, []) // Empty dependency array means this runs once on mount
+  // Fetch martyrs via API is now handled in parent components or a shared hook
 
   const locations = useMemo(() => [...new Set(martyrs.map(m => m.location))].sort(), [martyrs])
   const ageRanges = [
@@ -81,9 +66,10 @@ export default function MartyrsPage() {
 
   const filteredAndSortedMartyrs = useMemo(() => {
     let filtered = martyrs.filter(martyr => {
-      const matchesSearch = martyr.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           martyr.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           martyr.story.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesSearch = debouncedSearchQuery === '' ||
+        martyr.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        martyr.location?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        martyr.story?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
       
       const matchesLocation = selectedLocation === "all" || martyr.location === selectedLocation
       
@@ -117,7 +103,7 @@ export default function MartyrsPage() {
     })
 
     return filtered
-  }, [martyrs, searchQuery, selectedLocation, selectedAgeRange, sortBy, sortOrder])
+  }, [martyrs, debouncedSearchQuery, selectedLocation, selectedAgeRange, sortBy, sortOrder])
 
   const totalPages = Math.ceil(filteredAndSortedMartyrs.length / itemsPerPage)
   const paginatedMartyrs = filteredAndSortedMartyrs.slice(
@@ -142,6 +128,14 @@ export default function MartyrsPage() {
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full"
         />
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+        <div className="text-red-500">فشل تحميل البيانات</div>
       </main>
     )
   }

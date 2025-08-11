@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { ResponsiveNavbar } from "@/components/responsive-navbar"
 import { Button } from "@/components/ui/button"
@@ -39,6 +40,7 @@ interface FontAsset extends AdminAsset {
 }
 
 export default function AdminPage() {
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState("martyrs")
   const [adminAssets, setAdminAssets] = useState<any>({
     fonts: [],
@@ -125,9 +127,12 @@ export default function AdminPage() {
     file: null as File | null
   })
 
-  // Load admin assets on component mount
+  // Load admin assets on component mount; set tab from query if provided
   useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab) setActiveTab(tab)
     loadAdminAssets()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const loadAdminAssets = async () => {
@@ -859,10 +864,159 @@ export default function AdminPage() {
 
               {/* Similar structure for other tabs... */}
               <TabsContent value="designs">
-                <div className="text-center py-20">
-                  <Palette className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-white mb-4 font-mj-ghalam">إدارة التصاميم</h3>
-                  <p className="text-white/70 font-dg-mataryah">قريباً - إضافة وإدارة التصاميم والقوالب</p>
+                <div className="grid lg:grid-cols-2 gap-8">
+                  {/* Add Design Form */}
+                  <Card className="bg-white/10 backdrop-blur-xl border-white/20">
+                    <CardHeader>
+                      <CardTitle className="text-2xl font-bold text-white font-mj-ghalam flex items-center gap-2">
+                        <Plus className="w-6 h-6 text-blue-400" />
+                        إضافة تصميم جديد
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">اسم التصميم</Label>
+                          <Input
+                            value={designForm.name}
+                            onChange={(e) => setDesignForm(prev => ({ ...prev, name: e.target.value }))}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                            placeholder="مثال: بطاقة الشهيد محمد"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">القالب</Label>
+                          <Input
+                            value={designForm.template}
+                            onChange={(e) => setDesignForm(prev => ({ ...prev, template: e.target.value }))}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                            placeholder="مثال: البطاقة الكلاسيكية"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">الفئة</Label>
+                          <Select value={designForm.category} onValueChange={(value) => setDesignForm(prev => ({ ...prev, category: value }))}>
+                            <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                              <SelectValue placeholder="اختر الفئة" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-900 border-white/20">
+                              <SelectItem value="بطاقات" className="text-white">بطاقات</SelectItem>
+                              <SelectItem value="بوسترات" className="text-white">بوسترات</SelectItem>
+                              <SelectItem value="وسائل التواصل" className="text-white">وسائل التواصل</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">التنسيقات</Label>
+                          <Input
+                            value={designForm.formats.join(',')}
+                            onChange={(e) => setDesignForm(prev => ({ ...prev, formats: e.target.value.split(',').map(s => s.trim()).filter(Boolean) }))}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                            placeholder="PNG,JPG,PDF"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-white/80 font-dg-mataryah">الوصف</Label>
+                        <Textarea
+                          value={designForm.description}
+                          onChange={(e) => setDesignForm(prev => ({ ...prev, description: e.target.value }))}
+                          rows={3}
+                          className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                          placeholder="وصف مختصر للتصميم واستخداماته..."
+                        />
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">وسوم</Label>
+                          <Input
+                            value={designForm.tags.join(',')}
+                            onChange={(e) => setDesignForm(prev => ({ ...prev, tags: e.target.value.split(',').map(s => s.trim()).filter(Boolean) }))}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                            placeholder="شهيد, ذكرى, فلسطين"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">ملف المعاينة</Label>
+                          <div className="border-2 border-dashed border-white/20 rounded-lg p-4 text-center">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleFileUpload('designs', 'file', e.target.files?.[0] as File)}
+                              className="hidden"
+                              id="design-file"
+                            />
+                            <label htmlFor="design-file" className="cursor-pointer">
+                              <Upload className="w-8 h-8 text-white/60 mx-auto mb-2" />
+                              <p className="text-white/80 text-sm font-dg-mataryah">رفع صورة معاينة</p>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={() => saveAsset('designs', designForm)}
+                        disabled={isSaving || !designForm.name}
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white py-3 font-bold font-dg-mataryah"
+                      >
+                        {isSaving ? (
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                            className="w-5 h-5 border-2 border-white border-t-transparent rounded-full ml-2"
+                          />
+                        ) : (
+                          <Save className="w-5 h-5 ml-2" />
+                        )}
+                        {isSaving ? 'جاري الحفظ...' : 'حفظ التصميم'}
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Designs List */}
+                  <Card className="bg-white/10 backdrop-blur-xl border-white/20">
+                    <CardHeader>
+                      <CardTitle className="text-2xl font-bold text-white font-mj-ghalam flex items-center gap-2">
+                        <Palette className="w-6 h-6 text-blue-400" />
+                        قائمة التصاميم ({adminAssets.designs?.length || 0})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4 max-h-96 overflow-y-auto">
+                        {adminAssets.designs?.map((d: any) => (
+                          <div key={d.id} className="bg-white/10 rounded-lg p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded overflow-hidden bg-white/10">
+                                <img src={d.preview || '/placeholder.svg'} alt={d.name} className="w-full h-full object-cover" />
+                              </div>
+                              <div>
+                                <h4 className="text-white font-bold font-mj-ghalam">{d.name}</h4>
+                                <p className="text-white/70 text-sm font-dg-mataryah">{d.template} • {d.category}</p>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="ghost" className="text-white hover:bg-white/10">
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                className="text-red-400 hover:bg-red-500/20"
+                                onClick={() => deleteAsset('designs', d.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
 

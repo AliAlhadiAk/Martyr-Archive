@@ -1,14 +1,14 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import Image from "next/image"
 import { Search, Heart, Star, Users, Play, Volume2, VolumeX } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { motion } from "framer-motion"
-// Removed: import martyrData from '@/data/martyrs.json'
+import { useMartyrs } from "@/hooks/use-martyrs"
 
 interface Martyr {
   id: string;
@@ -26,38 +26,29 @@ export function OptimizedHero() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isAudioPlaying, setIsAudioPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [martyrs, setMartyrs] = useState<Martyr[]>([])
-  const [featuredMartyr, setFeaturedMartyr] = useState<Martyr | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, isLoading, error } = useMartyrs()
+  const martyrs: Martyr[] = useMemo(() => {
+    const list = (data && 'martyrs' in data ? data.martyrs : []) as any[]
+    return list.map((m) => ({
+      id: String(m.id),
+      name: m.name,
+      age: Number(m.age ?? 0),
+      location: m.location ?? '',
+      martyrdomDate: m.martyrdomDate || m.date || '',
+      image: m.image || '/placeholder.svg',
+      story: m.story || '',
+      testament: m.testament || '',
+      audioUrl: m.audioUrl || ''
+    }))
+  }, [data])
+  const featuredMartyr: Martyr | null = martyrs.length > 0 ? martyrs[0] : null
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
 
-  useEffect(() => {
-    const fetchMartyrs = async () => {
-      try {
-        setIsLoading(true)
-        const response = await fetch('/api/martyrs')
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const data = await response.json()
-        setMartyrs(data.martyrs || [])
-        if (data.martyrs && data.martyrs.length > 0) {
-          setFeaturedMartyr(data.martyrs[0]) // Set the first martyr as featured
-        }
-      } catch (e: any) {
-        setError(e.message)
-        console.error("Failed to fetch martyrs:", e)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    fetchMartyrs()
-  }, [])
+  // fetching handled by useMartyrs
 
   const handleSearch = useCallback(
     (e: React.FormEvent) => {
@@ -83,7 +74,7 @@ export function OptimizedHero() {
   if (error) {
     return (
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-black">
-        <div className="text-red-500 text-2xl">Error: {error}</div>
+        <div className="text-red-500 text-2xl">Error loading data</div>
       </section>
     )
   }
@@ -115,8 +106,19 @@ export function OptimizedHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.7 }}
           >
-            من دمهم كتب التاريخ، فلتبقى صورهم شاهدة على البطولة والتضحية
+            منصة أرشيف رقمية لحفظ وتوثيق سير الشهداء. نقدّم بطاقات تعريفية، قصصًا موثّقة، وصوتيات ومواد إعلامية يمكن للصحفيين والمصممين استخدامها. هدفنا إبقاء الذاكرة حيّة وتقديم محتوى موثوق وسهل المشاركة.
           </motion.p>
+
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto mb-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+          >
+            <div className="bg-white/10 rounded-xl p-4 text-white/90 font-dg-mataryah">بطاقات الشهداء مع معلومات وصور</div>
+            <div className="bg-white/10 rounded-xl p-4 text-white/90 font-dg-mataryah">رزنامة الاستشهاد حسب اليوم والشهر</div>
+            <div className="bg-white/10 rounded-xl p-4 text-white/90 font-dg-mataryah">عدّة إعلام ومولّد وصف بالذكاء الاصطناعي</div>
+          </motion.div>
 
           {/* Search */}
           <motion.form

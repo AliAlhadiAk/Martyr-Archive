@@ -13,7 +13,7 @@ const navItems = [
   { href: "/media-kit", label: "عدّة الإعلام", icon: Palette },
   { href: "/calendar", label: "رزنامة الشهداء", icon: Calendar },
   { href: "/design-generator", label: "مولّد التصميم", icon: Sparkles },
-  { href: "/my-designs", label: "تصميماتي", icon: LayoutGrid },
+  { href: "/designs", label: "التصاميم", icon: LayoutGrid },
   { href: "/admin", label: "لوحة الإدارة", icon: Plus },
   { href: "/contact", label: "تواصل معنا", icon: Phone },
 ]
