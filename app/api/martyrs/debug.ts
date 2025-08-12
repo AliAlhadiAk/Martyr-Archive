@@ -24,7 +24,7 @@ export function debugMartyrsData(martyrId?: string) {
       console.log('All martyrs:', {
         totalMartyrs: data.martyrs?.length,
         sampleMartyr: data.martyrs?.[0],
-        availableIds: data.martyrs?.map(m => m.id)
+        availableIds: data.martyrs?.map((m: { id: string | number }) => m.id)
       })
     }
   } catch (error) {

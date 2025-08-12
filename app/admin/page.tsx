@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { ResponsiveNavbar } from "@/components/responsive-navbar"
@@ -39,7 +39,7 @@ interface FontAsset extends AdminAsset {
   rating: number
 }
 
-export default function AdminPage() {
+function AdminPageContent() {
   const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState("martyrs")
   const [adminAssets, setAdminAssets] = useState<any>({
@@ -1056,5 +1056,17 @@ export default function AdminPage() {
         </div>
       </section>
     </main>
+  )
+}
+
+export default function AdminPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+      </main>
+    }>
+      <AdminPageContent />
+    </Suspense>
   )
 }
