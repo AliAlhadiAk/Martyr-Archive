@@ -6,10 +6,10 @@ const ADMIN_ASSETS_FILE = path.join(process.cwd(), 'data', 'admin-assets.json')
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { type: string; id: string } }
+  context: { params: Promise<{ type: string; id: string }> }
 ) {
   try {
-    const { type, id } = params
+    const { type, id } = await context.params
     
     // Read current data
     const fileContents = fs.readFileSync(ADMIN_ASSETS_FILE, 'utf8')

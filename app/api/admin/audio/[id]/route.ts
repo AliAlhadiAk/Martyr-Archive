@@ -4,7 +4,7 @@ import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const bucket = process.env.AWS_BUCKET_NAME
@@ -13,7 +13,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'S3 is not configured' }, { status: 500 })
     }
 
-    const key = decodeURIComponent(params.id)
+    const { id } = await context.params
+    const key = decodeURIComponent(id)
 
     await s3Client.send(
       new DeleteObjectCommand({
