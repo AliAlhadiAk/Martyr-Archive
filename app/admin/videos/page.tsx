@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react'
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { AudioUpload } from "@/components/admin/audio-upload"
+import { VideoUpload } from "@/components/admin/video-upload"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Trash2, Music, Clock, FileText, Download, Calendar } from 'lucide-react'
+import { Trash2, Video, Clock, FileText, Download, Calendar, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from "@/components/ui/use-toast"
 
-interface AudioFile {
+interface VideoFile {
   id: string
   title: string
   url: string
@@ -20,10 +20,11 @@ interface AudioFile {
   category?: string
   description?: string
   downloads?: number
+  thumbnail?: string
 }
 
-export default function AudioManagementPage() {
-  const [audioFiles, setAudioFiles] = useState<AudioFile[]>([])
+export default function VideoManagementPage() {
+  const [videoFiles, setVideoFiles] = useState<VideoFile[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
 
@@ -31,26 +32,27 @@ export default function AudioManagementPage() {
     const load = async () => {
       try {
         setIsLoading(true)
-        const res = await fetch('/api/media-kit/audio')
+        const res = await fetch('/api/media-kit/videos')
         if (!res.ok) return
         const data = await res.json()
-        const mapped: AudioFile[] = (data.audioFiles ?? []).map((a: any) => ({
-          id: a.id,
-          title: a.title,
-          url: a.url,
-          createdAt: a.createdAt || new Date().toISOString(),
-          duration: a.duration,
-          size: a.size,
-          category: a.category,
-          description: a.description,
-          downloads: a.downloads || 0,
+        const mapped: VideoFile[] = (data.videoFiles ?? []).map((v: any) => ({
+          id: v.id,
+          title: v.title,
+          url: v.url,
+          createdAt: v.createdAt || new Date().toISOString(),
+          duration: v.duration,
+          size: v.size,
+          category: v.category,
+          description: v.description,
+          downloads: v.downloads || 0,
+          thumbnail: v.thumbnail,
         }))
-        setAudioFiles(mapped)
+        setVideoFiles(mapped)
       } catch (error) {
-        console.error('Failed to load audio files:', error)
+        console.error('Failed to load video files:', error)
         toast({
           title: "خطأ في التحميل",
-          description: "فشل في تحميل الملفات الصوتية",
+          description: "فشل في تحميل ملفات الفيديو",
           variant: "destructive",
         })
       } finally {
@@ -61,20 +63,20 @@ export default function AudioManagementPage() {
   }, [toast])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('هل أنت متأكد من حذف هذا الملف الصوتي؟')) return
+    if (!confirm('هل أنت متأكد من حذف ملف الفيديو هذا؟')) return
 
     try {
-      const res = await fetch(`/api/admin/audio/${id}`, {
+      const res = await fetch(`/api/admin/videos/${id}`, {
         method: 'DELETE',
       })
 
       if (!res.ok) throw new Error('Failed to delete')
       
-      setAudioFiles(files => files.filter(file => file.id !== id))
+      setVideoFiles(files => files.filter(file => file.id !== id))
       
       toast({
         title: "تم الحذف بنجاح",
-        description: "تم حذف الملف الصوتي",
+        description: "تم حذف ملف الفيديو",
       })
     } catch (error) {
       console.error('Delete failed:', error)
@@ -117,20 +119,20 @@ export default function AudioManagementPage() {
         className="space-y-6"
       >
         <div className="flex items-center gap-3">
-          <Music className="w-6 h-6 text-blue-400" />
-          <h1 className="text-2xl font-bold text-white">إدارة الملفات الصوتية</h1>
+          <Video className="w-6 h-6 text-green-400" />
+          <h1 className="text-2xl font-bold text-white">إدارة ملفات الفيديو</h1>
         </div>
 
         <Card className="bg-white/5 border-white/10">
           <CardHeader>
-            <CardTitle className="text-white">رفع ملف صوتي جديد</CardTitle>
+            <CardTitle className="text-white">رفع ملف فيديو جديد</CardTitle>
           </CardHeader>
           <CardContent>
-            <AudioUpload onUploadComplete={(file) => {
-              setAudioFiles(prev => [...prev, file])
+            <VideoUpload onUploadComplete={(file) => {
+              setVideoFiles(prev => [...prev, file])
               toast({
                 title: "تم الرفع بنجاح",
-                description: "تم إضافة الملف الصوتي إلى المكتبة",
+                description: "تم إضافة ملف الفيديو إلى المكتبة",
               })
             }} />
           </CardContent>
@@ -138,14 +140,14 @@ export default function AudioManagementPage() {
 
         <Card className="bg-white/5 border-white/10">
           <CardHeader>
-            <CardTitle className="text-white">الملفات الصوتية المتوفرة ({audioFiles.length})</CardTitle>
+            <CardTitle className="text-white">ملفات الفيديو المتوفرة ({videoFiles.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            {audioFiles.length === 0 ? (
+            {videoFiles.length === 0 ? (
               <div className="text-center py-8 text-white/60">
-                <Music className="w-16 h-16 mx-auto mb-4 text-white/40" />
-                <p>لا توجد ملفات صوتية متوفرة</p>
-                <p className="text-sm text-white/40 mt-2">قم برفع ملف صوتي جديد لبدء الاستخدام</p>
+                <Video className="w-16 h-16 mx-auto mb-4 text-white/40" />
+                <p>لا توجد ملفات فيديو متوفرة</p>
+                <p className="text-sm text-white/40 mt-2">قم برفع ملف فيديو جديد لبدء الاستخدام</p>
               </div>
             ) : (
               <Table>
@@ -161,16 +163,27 @@ export default function AudioManagementPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {audioFiles.map((file) => (
+                  {videoFiles.map((file) => (
                     <TableRow key={file.id}>
                       <TableCell className="text-white/90">
-                        <div>
-                          <div className="font-medium">{file.title}</div>
-                          {file.description && (
-                            <div className="text-sm text-white/60 mt-1 line-clamp-2">
-                              {file.description}
+                        <div className="flex items-center gap-3">
+                          {file.thumbnail && (
+                            <div className="w-16 h-12 bg-white/10 rounded overflow-hidden">
+                              <img 
+                                src={file.thumbnail} 
+                                alt={file.title}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
                           )}
+                          <div>
+                            <div className="font-medium">{file.title}</div>
+                            {file.description && (
+                              <div className="text-sm text-white/60 mt-1 line-clamp-2">
+                                {file.description}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell className="text-white/70">
@@ -207,14 +220,26 @@ export default function AudioManagementPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(file.id)}
-                          className="text-red-400 hover:text-red-500 hover:bg-red-500/10"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => window.open(file.url, '_blank')}
+                            title="معاينة الفيديو"
+                            className="text-blue-400 hover:text-blue-500 hover:bg-blue-500/10"
+                          >
+                            <Play className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(file.id)}
+                            title="حذف الفيديو"
+                            className="text-red-400 hover:text-red-500 hover:bg-red-500/10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -227,3 +252,5 @@ export default function AudioManagementPage() {
     </div>
   )
 }
+
+

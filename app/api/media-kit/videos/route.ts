@@ -7,10 +7,10 @@ import path from 'path'
 
 const ADMIN_ASSETS_FILE = path.join(process.cwd(), 'data', 'admin-assets.json')
 
-// Function to get audio duration (approximate based on file size)
-const getAudioDuration = (fileSize: number, format: string): string => {
-  // Rough estimation: MP3 ~1MB per minute, WAV ~10MB per minute
-  const bytesPerMinute = format === 'audio/wav' ? 10 * 1024 * 1024 : 1024 * 1024
+// Function to get video duration (approximate based on file size)
+const getVideoDuration = (fileSize: number, format: string): string => {
+  // Rough estimation: MP4 ~50MB per minute, MOV ~100MB per minute
+  const bytesPerMinute = format.includes('mov') ? 100 * 1024 * 1024 : 50 * 1024 * 1024
   const minutes = Math.round(fileSize / bytesPerMinute)
   const hours = Math.floor(minutes / 60)
   const remainingMinutes = minutes % 60
@@ -28,33 +28,33 @@ export async function GET() {
       return NextResponse.json({ error: 'S3 bucket not configured' }, { status: 500 })
     }
 
-    // Get S3 audio files
+    // Get S3 video files
     const command = new ListObjectsV2Command({
       Bucket: bucket,
-      Prefix: 'audio/', // assuming audios are stored in an 'audio' folder
+      Prefix: 'videos/', // assuming videos are stored in a 'videos' folder
     })
 
     const response = await s3Client.send(command)
     
     // Get admin assets metadata
-    let adminAudioAssets: any[] = []
+    let adminVideoAssets: any[] = []
     try {
       if (fs.existsSync(ADMIN_ASSETS_FILE)) {
         const adminData = JSON.parse(fs.readFileSync(ADMIN_ASSETS_FILE, 'utf8'))
-        adminAudioAssets = adminData.audio || []
+        adminVideoAssets = adminData.videos || []
       }
     } catch (error) {
       console.error('Error reading admin assets:', error)
     }
 
     // Merge S3 files with admin metadata and generate fresh presigned URLs
-    const audioFiles = await Promise.all(
+    const videoFiles = await Promise.all(
       (response.Contents || []).map(async (file) => {
         const fileName = file.Key?.split('/').pop() || ''
         const fileId = file.Key || ''
         
         // Find matching admin metadata
-        const adminAsset = adminAudioAssets.find(asset => asset.id === fileId)
+        const adminAsset = adminVideoAssets.find(asset => asset.id === fileId)
         
         // Generate fresh presigned URL for viewing (expires in 1 hour)
         let presignedUrl = ''
@@ -81,36 +81,38 @@ export async function GET() {
             formats: adminAsset.formats,
             downloads: adminAsset.downloads || 0,
             createdAt: adminAsset.createdAt,
-            premium: adminAsset.premium || false
+            premium: adminAsset.premium || false,
+            thumbnail: adminAsset.thumbnail || ""
           }
         } else {
           // Fallback to basic S3 info
           const fileSize = file.Size || 0
-          const estimatedDuration = getAudioDuration(fileSize, 'audio/mpeg')
+          const estimatedDuration = getVideoDuration(fileSize, 'video/mp4')
           
           return {
             id: fileId,
             title: fileName.replace(/\.[^.]+$/, ''),
             url: presignedUrl,
             duration: estimatedDuration,
-            category: "موسيقى",
-            description: "ملف صوتي متوفر في المكتبة",
+            category: "فيديو تعريفي",
+            description: "ملف فيديو متوفر في المكتبة",
             size: `${(fileSize / (1024 * 1024)).toFixed(1)} MB`,
-            formats: ["MP3"],
+            formats: ["MP4"],
             downloads: 0,
             createdAt: file.LastModified?.toISOString() || new Date().toISOString(),
-            premium: false
+            premium: false,
+            thumbnail: ""
           }
         }
       })
     )
 
     // Sort by creation date (newest first)
-    audioFiles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    videoFiles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
-    return NextResponse.json({ audioFiles })
+    return NextResponse.json({ videoFiles })
   } catch (error) {
-    console.error('Error fetching audio files:', error)
-    return NextResponse.json({ error: 'Failed to fetch audio files' }, { status: 500 })
+    console.error('Error fetching video files:', error)
+    return NextResponse.json({ error: 'Failed to fetch video files' }, { status: 500 })
   }
 }

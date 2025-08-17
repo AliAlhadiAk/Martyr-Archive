@@ -32,10 +32,10 @@ const initializeAdminAssets = () => {
   }
 }
 
-// Function to get audio duration (approximate based on file size)
-const getAudioDuration = (fileSize: number, format: string): string => {
-  // Rough estimation: MP3 ~1MB per minute, WAV ~10MB per minute
-  const bytesPerMinute = format === 'audio/wav' ? 10 * 1024 * 1024 : 1024 * 1024
+// Function to get video duration (approximate based on file size)
+const getVideoDuration = (fileSize: number, format: string): string => {
+  // Rough estimation: MP4 ~50MB per minute, MOV ~100MB per minute
+  const bytesPerMinute = format.includes('mov') ? 100 * 1024 * 1024 : 50 * 1024 * 1024
   const minutes = Math.round(fileSize / bytesPerMinute)
   const hours = Math.floor(minutes / 60)
   const remainingMinutes = minutes % 60
@@ -50,9 +50,16 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
     const file = formData.get('file') as unknown as File | null
+    const title = formData.get('title') as string
+    const description = formData.get('description') as string
+    const category = formData.get('category') as string
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    }
+
+    if (!title) {
+      return NextResponse.json({ error: 'Title is required' }, { status: 400 })
     }
 
     const bucket = process.env.AWS_BUCKET_NAME
@@ -61,14 +68,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'S3 is not configured' }, { status: 500 })
     }
 
-    const originalName = (file as any).name || 'audio.webm'
+    const originalName = (file as any).name || 'video.mp4'
     const safeName = originalName.replace(/\s+/g, '-').replace(/[^\w\.-]/g, '')
-    const key = `audio/${Date.now()}-${safeName}`
+    const key = `videos/${Date.now()}-${safeName}`
 
     const arrayBuffer = await file.arrayBuffer()
     const body = Buffer.from(arrayBuffer)
 
-    const sse = process.env.AWS_S3_SSE // e.g., 'aws:kms' or 'AES256'
+    const sse = process.env.AWS_S3_SSE
     const sseKmsKeyId = process.env.AWS_S3_KMS_KEY_ID
 
     await s3Client.send(
@@ -76,14 +83,14 @@ export async function POST(req: NextRequest) {
         Bucket: bucket,
         Key: key,
         Body: body,
-        ContentType: (file as any).type || 'audio/mpeg',
+        ContentType: (file as any).type || 'video/mp4',
         ...(sse ? { ServerSideEncryption: sse as any } : {}),
         ...(sse === 'aws:kms' && sseKmsKeyId ? { SSEKMSKeyId: sseKmsKeyId } : {}),
       })
     )
 
     const fileSize = (file as any).size || 0
-    const duration = getAudioDuration(fileSize, (file as any).type || 'audio/mpeg')
+    const duration = getVideoDuration(fileSize, (file as any).type || 'video/mp4')
     
     // Generate presigned URL for viewing (expires in 1 hour)
     const presignedUrl = await getSignedUrl(
@@ -92,21 +99,22 @@ export async function POST(req: NextRequest) {
       { expiresIn: 3600 }
     )
     
-    // Create audio asset metadata
-    const audioAsset = {
+    // Create video asset metadata
+    const videoAsset = {
       id: key,
-      name: safeName.replace(/\.[^.]+$/, ''),
-      category: "موسيقى",
-      preview: "/placeholder.svg?height=200&width=300&text=موسيقى+تصويرية",
-      description: "ملف صوتي تم رفعه من لوحة الإدارة",
+      name: title,
+      category: category || "فيديو تعريفي",
+      preview: "/placeholder.svg?height=300&width=400&text=فيديو+تعريفي",
+      description: description || "فيديو تم رفعه من لوحة الإدارة",
       downloads: 0,
-      formats: [(file as any).type || 'audio/mpeg'],
+      formats: [(file as any).type || 'video/mp4'],
       size: `${(fileSize / (1024 * 1024)).toFixed(1)} MB`,
       duration: duration,
-      tags: ["موسيقى", "صوتي", "مرفوع"],
+      tags: ["فيديو", "مرفوع"],
       createdAt: new Date().toISOString(),
       createdBy: "admin",
-      url: presignedUrl
+      url: presignedUrl,
+      thumbnail: "" // Will be generated later if needed
     }
 
     // Save to admin assets
@@ -115,11 +123,11 @@ export async function POST(req: NextRequest) {
       const fileContents = fs.readFileSync(ADMIN_ASSETS_FILE, 'utf8')
       const data = JSON.parse(fileContents)
       
-      if (!data.audio) {
-        data.audio = []
+      if (!data.videos) {
+        data.videos = []
       }
       
-      data.audio.push(audioAsset)
+      data.videos.push(videoAsset)
       
       fs.writeFileSync(ADMIN_ASSETS_FILE, JSON.stringify(data, null, 2))
     } catch (error) {
@@ -129,17 +137,18 @@ export async function POST(req: NextRequest) {
 
     const payload = {
       id: key,
-      title: safeName.replace(/\.[^.]+$/, ''),
+      title: title,
       url: presignedUrl,
       duration,
+      size: `${(fileSize / (1024 * 1024)).toFixed(1)} MB`,
+      category: category || "فيديو تعريفي",
+      description: description || "فيديو تم رفعه من لوحة الإدارة",
       createdAt: new Date().toISOString(),
     }
 
     return NextResponse.json(payload)
   } catch (error) {
-    console.error('Upload audio error:', error)
-    return NextResponse.json({ error: 'Failed to upload audio' }, { status: 500 })
+    console.error('Upload video error:', error)
+    return NextResponse.json({ error: 'Failed to upload video' }, { status: 500 })
   }
 }
-
-

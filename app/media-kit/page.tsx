@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { AudioSection } from '@/components/media-kit/audio-section'
+import { VideoSection } from '@/components/media-kit/video-section'
 
 // Define types for fetched assets
 interface FontAsset {
@@ -56,62 +57,20 @@ interface MediaAssets {
   audio: OtherAsset[];
 }
 
-const mediaCategories = [
-  {
-    id: "fonts",
-    name: "الخطوط العربية",
-    icon: Type,
-    color: "from-purple-500 to-pink-500",
-    count: 0, // Will be updated dynamically
-    description: "مجموعة حصرية من أفخم الخطوط العربية"
-  },
-  {
-    id: "logos",
-    name: "الشعارات والهويات",
-    icon: Diamond,
-    color: "from-blue-500 to-cyan-500",
-    count: 0, // Will be updated dynamically
-    description: "شعارات وهويات بصرية متكاملة"
-  },
-  {
-    id: "templates",
-    name: "القوالب التصميمية",
-    icon: Layers,
-    color: "from-green-500 to-emerald-500",
-    count: 0, // Will be updated dynamically
-    description: "قوالب جاهزة للبطاقات والبوسترات"
-  },
-  {
-    id: "graphics",
-    name: "العناصر الجرافيكية",
-    icon: Palette,
-    color: "from-orange-500 to-red-500",
-    count: 0, // Will be updated dynamically
-    description: "أيقونات وعناصر تصميمية متنوعة"
-  },
-  {
-    id: "videos",
-    name: "المقاطع المرئية",
-    icon: Video,
-    color: "from-indigo-500 to-purple-500",
-    count: 0, // Will be updated dynamically
-    description: "فيديوهات تعريفية وخلفيات متحركة"
-  },
-  {
-    id: "audio",
-    name: "المقاطع الصوتية",
-    icon: Music,
-    color: "from-teal-500 to-blue-500",
-    count: 0, // Will be updated dynamically
-    description: "تسجيلات صوتية وموسيقى تصويرية"
-  }
-]
+
 
 async function getAudioFiles() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/media-kit/audio`)
   if (!res.ok) return []
   const data = await res.json()
   return data.audioFiles
+}
+
+async function getVideoFiles() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/media-kit/videos`)
+  if (!res.ok) return []
+  const data = await res.json()
+  return data.videoFiles
 }
 
 export default function MediaKitPage() {
@@ -131,6 +90,79 @@ export default function MediaKitPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [showDialog, setShowDialog] = useState(false)
   const [audioFiles, setAudioFiles] = useState<any[]>([])
+  const [videoFiles, setVideoFiles] = useState<any[]>([])
+  const [categoryCounts, setCategoryCounts] = useState({
+    fonts: 0,
+    logos: 0,
+    templates: 0,
+    graphics: 0,
+    videos: 0,
+    audio: 0
+  })
+
+  // Media categories with dynamic counts
+  const mediaCategories = [
+    {
+      id: "fonts",
+      name: "الخطوط العربية",
+      icon: Type,
+      color: "from-purple-500 to-pink-500",
+      count: categoryCounts.fonts,
+      description: "مجموعة حصرية من أفخم الخطوط العربية"
+    },
+    {
+      id: "logos",
+      name: "الشعارات والهويات",
+      icon: Diamond,
+      color: "from-blue-500 to-cyan-500",
+      count: categoryCounts.logos,
+      description: "شعارات وهويات بصرية متكاملة"
+    },
+    {
+      id: "templates",
+      name: "القوالب التصميمية",
+      icon: Layers,
+      color: "from-green-500 to-emerald-500",
+      count: categoryCounts.templates,
+      description: "قوالب جاهزة للبطاقات والبوسترات"
+    },
+    {
+      id: "graphics",
+      name: "العناصر الجرافيكية",
+      icon: Palette,
+      color: "from-orange-500 to-red-500",
+      count: categoryCounts.graphics,
+      description: "أيقونات وعناصر تصميمية متنوعة"
+    },
+    {
+      id: "videos",
+      name: "المقاطع المرئية",
+      icon: Video,
+      color: "from-indigo-500 to-purple-500",
+      count: categoryCounts.videos,
+      description: "فيديوهات تعريفية وخلفيات متحركة"
+    },
+    {
+      id: "audio",
+      name: "المقاطع الصوتية",
+      icon: Music,
+      color: "from-teal-500 to-blue-500",
+      count: categoryCounts.audio,
+      description: "تسجيلات صوتية وموسيقى تصويرية"
+    }
+  ]
+
+  // Function to update category counts
+  const updateCategoryCounts = (mediaAssets: MediaAssets, audioFilesList: any[]) => {
+    setCategoryCounts({
+      fonts: mediaAssets.fonts.length,
+      logos: mediaAssets.designs.length, // logos are stored in designs
+      templates: mediaAssets.posters.length, // templates are stored in posters
+      graphics: mediaAssets.graphics.length,
+      videos: mediaAssets.videos.length,
+      audio: audioFilesList.length
+    })
+  }
 
   // Fetch media assets dynamically
   useEffect(() => {
@@ -141,7 +173,7 @@ export default function MediaKitPage() {
         if (response.ok) {
           const data = await response.json()
           // Ensure all properties are arrays and map to expected types
-          setMediaData({
+          const mappedData = {
             fonts: Array.isArray(data.fonts) ? data.fonts.map((font: any) => ({
               id: font.id,
               name: font.name,
@@ -165,7 +197,11 @@ export default function MediaKitPage() {
             graphics: Array.isArray(data.graphics) ? data.graphics : [],
             videos: Array.isArray(data.videos) ? data.videos : [],
             audio: Array.isArray(data.audio) ? data.audio : []
-          })
+          }
+          setMediaData(mappedData)
+          
+          // Update category counts after media data is loaded
+          updateCategoryCounts(mappedData, audioFiles)
         } else {
           console.error("Failed to fetch media assets:", response.statusText)
           setMediaData({ fonts: [], designs: [], posters: [], graphics: [], videos: [], audio: [] })
@@ -184,10 +220,25 @@ export default function MediaKitPage() {
     const fetchAudioFiles = async () => {
       const files = await getAudioFiles()
       setAudioFiles(files)
+      
+      // Update category counts when audio files are loaded
+      updateCategoryCounts(mediaData, files)
     }
 
     fetchAudioFiles()
-  }, [])
+  }, [mediaData])
+
+  useEffect(() => {
+    const fetchVideoFiles = async () => {
+      const files = await getVideoFiles()
+      setVideoFiles(files)
+      
+      // Update category counts when video files are loaded
+      updateCategoryCounts(mediaData, audioFiles)
+    }
+
+    fetchVideoFiles()
+  }, [mediaData, audioFiles])
 
   const downloadFont = async (font: FontAsset) => {
     setDownloadingItem(`font-${font.id}`)
@@ -679,6 +730,44 @@ export default function MediaKitPage() {
                     ))}
                   </div>
                 </motion.div>
+              ) : selectedCategory === "audio" ? (
+                <motion.div
+                  key="audio"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="text-center mb-12">
+                    <h3 className="text-4xl font-bold text-white mb-4 font-mj-ghalam">
+                      المقاطع الصوتية
+                    </h3>
+                    <p className="text-xl text-white/60 font-dg-mataryah">
+                      تسجيلات صوتية وموسيقى تصويرية عالية الجودة
+                    </p>
+                  </div>
+
+                  <AudioSection audioFiles={audioFiles} />
+                </motion.div>
+              ) : selectedCategory === "videos" ? (
+                <motion.div
+                  key="videos"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="text-center mb-12">
+                    <h3 className="text-4xl font-bold text-white mb-4 font-mj-ghalam">
+                      ملفات الفيديو
+                    </h3>
+                    <p className="text-xl text-white/60 font-dg-mataryah">
+                      مقاطع فيديو عالية الجودة ومحتوى مرئي متنوع
+                    </p>
+                  </div>
+
+                  <VideoSection videoFiles={videoFiles} />
+                </motion.div>
               ) : (
                 /* Other Categories */
                 <motion.div
@@ -835,9 +924,7 @@ export default function MediaKitPage() {
           </div>
         </section>
 
-        <section className="mt-12">
-          <AudioSection audioFiles={audioFiles} />
-        </section>
+
       </main>
     </>
   )

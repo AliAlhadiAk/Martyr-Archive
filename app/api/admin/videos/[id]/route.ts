@@ -14,7 +14,7 @@ export async function DELETE(
     const { id } = params
 
     if (!id) {
-      return NextResponse.json({ error: 'Audio ID is required' }, { status: 400 })
+      return NextResponse.json({ error: 'Video ID is required' }, { status: 400 })
     }
 
     const bucket = process.env.AWS_BUCKET_NAME
@@ -41,8 +41,8 @@ export async function DELETE(
         const fileContents = fs.readFileSync(ADMIN_ASSETS_FILE, 'utf8')
         const data = JSON.parse(fileContents)
         
-        if (data.audio && Array.isArray(data.audio)) {
-          data.audio = data.audio.filter((audio: any) => audio.id !== id)
+        if (data.videos && Array.isArray(data.videos)) {
+          data.videos = data.videos.filter((video: any) => video.id !== id)
           fs.writeFileSync(ADMIN_ASSETS_FILE, JSON.stringify(data, null, 2))
         }
       }
@@ -51,12 +51,11 @@ export async function DELETE(
       // Continue even if admin assets update fails
     }
 
-    return NextResponse.json({ success: true, message: 'Audio file deleted successfully' })
+    return NextResponse.json({ success: true, message: 'Video file deleted successfully' })
   } catch (error) {
-    console.error('Delete audio error:', error)
-    return NextResponse.json({ error: 'Failed to delete audio file' }, { status: 500 })
+    console.error('Delete video error:', error)
+    return NextResponse.json({ error: 'Failed to delete video file' }, { status: 500 })
   }
 }
-
 
 

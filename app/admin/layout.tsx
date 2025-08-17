@@ -1,5 +1,5 @@
 import React from 'react'
-import { Music, LayoutDashboard, Users, Image, FileText } from 'lucide-react'
+import { Music, LayoutDashboard, Users, Image, FileText, Video } from 'lucide-react'
 
 export default function AdminLayout({
   children,
@@ -26,6 +26,11 @@ export default function AdminLayout({
       href: '/admin/audio',
       label: 'الملفات الصوتية',
       icon: Music,
+    },
+    {
+      href: '/admin/videos',
+      label: 'ملفات الفيديو',
+      icon: Video,
     },
     {
       href: '/admin/posts',

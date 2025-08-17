@@ -229,49 +229,51 @@ export default function DesignsPage() {
                     className="bg-white/10 border-white/20 text-white placeholder:text-white/60 pr-12 h-12 font-dg-mataryah"
                   />
                 </div>
+                </div>
 
                 {/* Filters */}
-                <div className="flex gap-2">
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-40 bg-white/10 border-white/20 text-white h-12 font-dg-mataryah">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-900 border-white/20">
-                      {categories.map(category => (
-                        <SelectItem key={category} value={category} className="text-white font-dg-mataryah">
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+               {/* Filters */}
+               <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+    <SelectTrigger className="w-full sm:w-40 bg-white/10 border-white/20 text-white h-12 font-dg-mataryah">
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent className="bg-gray-900 border-white/20">
+      {categories.map(category => (
+        <SelectItem key={category} value={category} className="text-white font-dg-mataryah">
+          {category}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
 
-                  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                    <SelectTrigger className="w-32 bg-white/10 border-white/20 text-white h-12 font-dg-mataryah">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-900 border-white/20">
-                      {statuses.map(status => (
-                        <SelectItem key={status} value={status} className="text-white font-dg-mataryah">
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+    <SelectTrigger className="w-full sm:w-32 bg-white/10 border-white/20 text-white h-12 font-dg-mataryah">
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent className="bg-gray-900 border-white/20">
+      {statuses.map(status => (
+        <SelectItem key={status} value={status} className="text-white font-dg-mataryah">
+          {status}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
 
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-40 bg-white/10 border-white/20 text-white h-12 font-dg-mataryah">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-900 border-white/20">
-                      {sortOptions.map(option => (
-                        <SelectItem key={option.value} value={option.value} className="text-white font-dg-mataryah">
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+  <Select value={sortBy} onValueChange={setSortBy}>
+    <SelectTrigger className="w-full sm:w-40 bg-white/10 border-white/20 text-white h-12 font-dg-mataryah">
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent className="bg-gray-900 border-white/20">
+      {sortOptions.map(option => (
+        <SelectItem key={option.value} value={option.value} className="text-white font-dg-mataryah">
+          {option.label}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
+
 
               {/* View Mode and Actions */}
               <div className="flex gap-2">

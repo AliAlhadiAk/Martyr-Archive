@@ -137,6 +137,27 @@
       ],
       "createdAt": "2024-01-03T11:30:00Z",
       "createdBy": "admin"
+    },
+    {
+      "id": "videos/1755439402183-http___localhost_3000_urls---My-Workspace-2025-01-15-19-33-09.mp4",
+      "name": "http___localhost_3000_urls - My Workspace 2025-01-15 19-33-09",
+      "category": "فيديو تعريفي",
+      "preview": "/placeholder.svg?height=300&width=400&text=فيديو+تعريفي",
+      "description": "فيديو تم رفعه من لوحة الإدارة",
+      "downloads": 0,
+      "formats": [
+        "video/mp4"
+      ],
+      "size": "1.6 MB",
+      "duration": "0:00",
+      "tags": [
+        "فيديو",
+        "مرفوع"
+      ],
+      "createdAt": "2025-08-17T14:03:23.055Z",
+      "createdBy": "admin",
+      "url": "https://martyr-archive-audios-2025.s3.eu-west-1.amazonaws.com/videos/1755439402183-http___localhost_3000_urls---My-Workspace-2025-01-15-19-33-09.mp4",
+      "thumbnail": ""
     }
   ],
   "audio": [
