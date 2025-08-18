@@ -1,3 +1,4 @@
+
 import { ResponsiveNavbar } from "@/components/responsive-navbar"
 import { SharedBackground } from "@/components/shared-background"
 import { OptimizedHero } from "@/components/optimized-hero"
