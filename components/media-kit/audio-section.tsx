@@ -36,9 +36,16 @@ export function AudioSection({ audioFiles }: { audioFiles: AudioFile[] }) {
     }
   }
 
-  const handleDownload = async (url: string, title: string) => {
+  const handleDownload = async (id: string, title: string) => {
     try {
-      const response = await fetch(url)
+      // Use the proper download endpoint
+      const response = await fetch(`/api/media-kit/audio/${id}/download`)
+      
+      if (!response.ok) {
+        throw new Error('Download failed')
+      }
+
+      // Create blob and download
       const blob = await response.blob()
       const downloadUrl = URL.createObjectURL(blob)
       const link = document.createElement('a')
@@ -48,8 +55,12 @@ export function AudioSection({ audioFiles }: { audioFiles: AudioFile[] }) {
       link.click()
       document.body.removeChild(link)
       URL.revokeObjectURL(downloadUrl)
+
+      // Show success message (you can add toast here if needed)
+      console.log(`Downloaded: ${title}`)
     } catch (error) {
       console.error('Download failed:', error)
+      // Show error message (you can add toast here if needed)
     }
   }
 
@@ -72,7 +83,9 @@ export function AudioSection({ audioFiles }: { audioFiles: AudioFile[] }) {
               </div>
 
               <audio
-                ref={(el) => (audioRefs.current[audio.id] = el)}
+                ref={(el) => {
+                  audioRefs.current[audio.id] = el
+                }}
                 src={audio.url}
                 onTimeUpdate={(e) => {
                   const el = e.currentTarget
@@ -114,7 +127,7 @@ export function AudioSection({ audioFiles }: { audioFiles: AudioFile[] }) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDownload(audio.url, audio.title)}
+                    onClick={() => handleDownload(audio.id, audio.title)}
                     title="تحميل"
                   >
                     <Download className="h-6 w-6 text-white/60" />

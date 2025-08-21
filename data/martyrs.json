@@ -1,0 +1,557 @@
+{
+  "martyrs": [
+    {
+      "id": "martyr_001",
+      "personalInfo": {
+        "name": "أحمد محمد علي",
+        "arabicName": "أحمد محمد علي",
+        "englishName": "Ahmed Mohamed Ali",
+        "age": 25,
+        "dateOfBirth": "1998-05-15",
+        "placeOfBirth": "غزة",
+        "nationality": "فلسطيني",
+        "martyrdomDate": "2023-10-07",
+        "martyrdomPlace": "غزة",
+        "martyrdomCircumstances": "استشهد أثناء الدفاع عن أرضه"
+      },
+      "familyInfo": {
+        "fatherName": "محمد علي",
+        "motherName": "فاطمة أحمد",
+        "siblings": [
+          "علي",
+          "مريم",
+          "خالد"
+        ],
+        "spouse": null,
+        "children": []
+      },
+      "biography": {
+        "education": "بكالوريوس في الهندسة المدنية",
+        "occupation": "مهندس مدني",
+        "achievements": [
+          "تخرج بامتياز",
+          "عمل في مشاريع إعادة الإعمار"
+        ],
+        "interests": [
+          "القراءة",
+          "السباحة",
+          "مساعدة الآخرين"
+        ],
+        "testament": "أوصي إخواني بالصبر والثبات على الحق"
+      },
+      "mediaAssets": {
+        "profileImage": {
+          "id": "profile_001",
+          "path": "martyrs/martyr_001/profile/profile-image.jpg",
+          "url": "https://supabase.co/storage/v1/object/public/images/martyrs/martyr_001/profile/profile-image.jpg",
+          "altText": "صورة الشهيد أحمد محمد علي",
+          "uploadedAt": "2024-01-15T10:30:00Z",
+          "fileSize": "2.1 MB",
+          "dimensions": {
+            "width": 800,
+            "height": 600
+          }
+        },
+        "gallery": [
+          {
+            "id": "gallery_001",
+            "path": "martyrs/martyr_001/gallery/childhood-photo.jpg",
+            "url": "https://supabase.co/storage/v1/object/public/images/martyrs/martyr_001/gallery/childhood-photo.jpg",
+            "altText": "صورة طفولة الشهيد",
+            "uploadedAt": "2024-01-15T10:35:00Z",
+            "fileSize": "1.8 MB",
+            "dimensions": {
+              "width": 600,
+              "height": 400
+            },
+            "caption": "صورة من طفولة الشهيد أحمد"
+          },
+          {
+            "id": "gallery_002",
+            "path": "martyrs/martyr_001/gallery/graduation-photo.jpg",
+            "url": "https://supabase.co/storage/v1/object/public/images/martyrs/martyr_001/gallery/graduation-photo.jpg",
+            "altText": "صورة تخرج الشهيد",
+            "uploadedAt": "2024-01-15T10:40:00Z",
+            "fileSize": "2.3 MB",
+            "dimensions": {
+              "width": 800,
+              "height": 600
+            },
+            "caption": "صورة تخرج الشهيد من الجامعة"
+          }
+        ],
+        "audio": [
+          {
+            "id": "audio_001",
+            "path": "martyrs/martyr_001/audio/testament-recording.mp3",
+            "url": "https://supabase.co/storage/v1/object/public/audio/martyrs/martyr_001/audio/testament-recording.mp3",
+            "title": "تسجيل وصية الشهيد",
+            "duration": "3:45",
+            "uploadedAt": "2024-01-15T10:45:00Z",
+            "fileSize": "5.2 MB",
+            "description": "تسجيل صوتي لوصية الشهيد أحمد"
+          }
+        ],
+        "documents": [
+          {
+            "id": "doc_001",
+            "path": "martyrs/martyr_001/documents/graduation-certificate.pdf",
+            "url": "https://supabase.co/storage/v1/object/public/documents/martyrs/martyr_001/documents/graduation-certificate.pdf",
+            "title": "شهادة التخرج",
+            "type": "PDF",
+            "uploadedAt": "2024-01-15T10:50:00Z",
+            "fileSize": "1.1 MB",
+            "description": "شهادة تخرج الشهيد من الجامعة"
+          }
+        ]
+      },
+      "metadata": {
+        "createdAt": "2024-01-15T10:00:00Z",
+        "updatedAt": "2024-01-15T10:50:00Z",
+        "createdBy": "admin",
+        "status": "active",
+        "tags": [
+          "مهندس",
+          "غزة",
+          "2023",
+          "دفاع"
+        ],
+        "priority": "high",
+        "verificationStatus": "verified"
+      },
+      "statistics": {
+        "views": 1250,
+        "downloads": 89,
+        "shares": 156,
+        "memorialCandles": 342
+      }
+    },
+    {
+      "id": "martyr_1755771153723_26",
+      "personalInfo": {
+        "name": "ssssssss",
+        "arabicName": "sss",
+        "englishName": "sss",
+        "dateOfBirth": "2025-08-04",
+        "placeOfBirth": "ssssssssssssssss",
+        "nationality": "فلsسطيني",
+        "martyrdomDate": "2025-08-20",
+        "martyrdomPlace": "sssssssssssssss",
+        "martyrdomCircumstances": "sssss",
+        "age": 0
+      },
+      "familyInfo": {
+        "fatherName": "sss",
+        "motherName": "ss",
+        "siblings": [
+          "ss"
+        ],
+        "spouse": "ss",
+        "children": [
+          "ss"
+        ]
+      },
+      "biography": {
+        "education": "ss",
+        "occupation": "ss",
+        "achievements": [
+          "ss"
+        ],
+        "interests": [
+          "ss"
+        ],
+        "testament": "ss"
+      },
+      "mediaAssets": {
+        "profileImage": null,
+        "gallery": [],
+        "videos": [],
+        "audio": [],
+        "documents": []
+      },
+      "metadata": {
+        "createdAt": "2025-08-21T10:12:35.382Z",
+        "updatedAt": "2025-08-21T10:12:35.382Z",
+        "createdBy": "admin",
+        "status": "active",
+        "tags": [
+          "ss"
+        ],
+        "priority": "medium",
+        "verificationStatus": "pending"
+      },
+      "statistics": {
+        "views": 0,
+        "downloads": 0,
+        "shares": 0,
+        "memorialCandles": 0
+      }
+    },
+    {
+      "id": "martyr_1755771349821_920",
+      "personalInfo": {
+        "name": "ssssssss",
+        "arabicName": "ssss",
+        "englishName": "ss",
+        "dateOfBirth": "2025-08-05",
+        "placeOfBirth": "ss",
+        "nationality": "فلسطيني",
+        "martyrdomDate": "2025-08-19",
+        "martyrdomPlace": "sss",
+        "martyrdomCircumstances": "ss",
+        "age": 0
+      },
+      "familyInfo": {
+        "fatherName": "ss",
+        "motherName": "s",
+        "siblings": [
+          "s"
+        ],
+        "spouse": "s",
+        "children": [
+          "s"
+        ]
+      },
+      "biography": {
+        "education": "s",
+        "occupation": "s",
+        "achievements": [
+          "s"
+        ],
+        "interests": [
+          "s"
+        ],
+        "testament": "s"
+      },
+      "mediaAssets": {
+        "profileImage": null,
+        "gallery": [],
+        "videos": [],
+        "audio": [],
+        "documents": []
+      },
+      "metadata": {
+        "createdAt": "2025-08-21T10:15:52.520Z",
+        "updatedAt": "2025-08-21T10:15:52.521Z",
+        "createdBy": "admin",
+        "status": "active",
+        "tags": [
+          "s"
+        ],
+        "priority": "medium",
+        "verificationStatus": "pending"
+      },
+      "statistics": {
+        "views": 0,
+        "downloads": 0,
+        "shares": 0,
+        "memorialCandles": 0
+      }
+    },
+    {
+      "id": "martyr_1755775700867_136",
+      "personalInfo": {
+        "name": "asdas",
+        "arabicName": "asd",
+        "englishName": "asd",
+        "dateOfBirth": "2025-08-06",
+        "placeOfBirth": "asd",
+        "nationality": "فلسطيني",
+        "martyrdomDate": "2025-08-14",
+        "martyrdomPlace": "asdasd",
+        "martyrdomCircumstances": "asdasd",
+        "age": 0
+      },
+      "familyInfo": {
+        "fatherName": "asdasd",
+        "motherName": "asdasd",
+        "siblings": [
+          "asdasd"
+        ],
+        "spouse": "asd",
+        "children": [
+          "asd"
+        ]
+      },
+      "biography": {
+        "education": "asd",
+        "occupation": "asd",
+        "achievements": [
+          "d"
+        ],
+        "interests": [
+          "d"
+        ],
+        "testament": "d"
+      },
+      "mediaAssets": {
+        "profileImage": {
+          "id": "profile_martyr_1755775700867_136_1755775703623",
+          "path": "martyrs/martyr_1755775700867_136/profile/profile-1755775700867-b2b646f5-3677-4bd8-b70d-b068aa482a3a-(1).jpg",
+          "url": "https://storage.googleapis.com/steam-canto-461415-s4-images/1755775702810-profile-1755775700867-b2b646f5-3677-4bd8-b70d-b068aa482a3a-1.jpg",
+          "altText": "صورة الشهيد martyr_1755775700867_136",
+          "uploadedAt": "2025-08-21T11:28:23.623Z",
+          "fileSize": "0.1 MB",
+          "dimensions": {
+            "width": 800,
+            "height": 600
+          }
+        },
+        "gallery": [],
+        "videos": [],
+        "audio": [],
+        "documents": []
+      },
+      "metadata": {
+        "createdAt": "2025-08-21T11:28:23.623Z",
+        "updatedAt": "2025-08-21T11:28:23.623Z",
+        "createdBy": "admin",
+        "status": "active",
+        "tags": [
+          "d"
+        ],
+        "priority": "medium",
+        "verificationStatus": "pending"
+      },
+      "statistics": {
+        "views": 0,
+        "downloads": 0,
+        "shares": 0,
+        "memorialCandles": 0
+      }
+    },
+    {
+      "id": "martyr_1755776280177_539",
+      "personalInfo": {
+        "name": "w",
+        "arabicName": "w",
+        "englishName": "w",
+        "dateOfBirth": "2025-08-04",
+        "placeOfBirth": "w",
+        "nationality": "فلسطينيw",
+        "martyrdomDate": "2025-08-22",
+        "martyrdomPlace": "w",
+        "martyrdomCircumstances": "w",
+        "age": 0
+      },
+      "familyInfo": {
+        "fatherName": "w",
+        "motherName": "w",
+        "siblings": [
+          "w"
+        ],
+        "spouse": "w",
+        "children": [
+          "w"
+        ]
+      },
+      "biography": {
+        "education": "w",
+        "occupation": "w",
+        "achievements": [
+          "w"
+        ],
+        "interests": [
+          "w"
+        ],
+        "testament": "w"
+      },
+      "mediaAssets": {
+        "profileImage": {
+          "id": "profile_martyr_1755776280177_539_1755776281360",
+          "path": "martyrs/martyr_1755776280177_539/profile/profile-1755776280177-asdas-تذكاري.png",
+          "url": "https://storage.googleapis.com/steam-canto-461415-s4-images/1755776280667-profile-1755776280177-asdas-.png",
+          "altText": "صورة الشهيد martyr_1755776280177_539",
+          "uploadedAt": "2025-08-21T11:38:01.360Z",
+          "fileSize": "0.0 MB",
+          "dimensions": {
+            "width": 800,
+            "height": 600
+          }
+        },
+        "gallery": [],
+        "videos": [],
+        "audio": [],
+        "documents": []
+      },
+      "metadata": {
+        "createdAt": "2025-08-21T11:38:01.360Z",
+        "updatedAt": "2025-08-21T11:38:01.360Z",
+        "createdBy": "admin",
+        "status": "active",
+        "tags": [
+          "w"
+        ],
+        "priority": "medium",
+        "verificationStatus": "pending"
+      },
+      "statistics": {
+        "views": 0,
+        "downloads": 0,
+        "shares": 0,
+        "memorialCandles": 0
+      }
+    },
+    {
+      "id": "martyr_1755776337522_677",
+      "personalInfo": {
+        "name": "s",
+        "arabicName": "s",
+        "englishName": "s",
+        "dateOfBirth": "2025-08-03",
+        "placeOfBirth": "s",
+        "nationality": "فsلسطيني",
+        "martyrdomDate": "2025-08-19",
+        "martyrdomPlace": "غير محدد",
+        "martyrdomCircumstances": "s",
+        "age": 0
+      },
+      "familyInfo": {
+        "fatherName": "s",
+        "motherName": "s",
+        "siblings": [
+          "s"
+        ],
+        "spouse": "s",
+        "children": [
+          "s"
+        ]
+      },
+      "biography": {
+        "education": "s",
+        "occupation": "s",
+        "achievements": [
+          "s"
+        ],
+        "interests": [
+          "s"
+        ],
+        "testament": "s"
+      },
+      "mediaAssets": {
+        "profileImage": {
+          "id": "profile_martyr_1755776337522_677_1755776338936",
+          "path": "martyrs/martyr_1755776337522_677/profile/profile-1755776337522-WhatsApp-Image-2025-08-02-at-13.41.52.jpeg",
+          "url": "https://storage.googleapis.com/steam-canto-461415-s4-images/1755776337997-profile-1755776337522-WhatsApp-Image-2025-08-02-at-13.41.52.jpeg",
+          "altText": "صورة الشهيد martyr_1755776337522_677",
+          "uploadedAt": "2025-08-21T11:38:58.936Z",
+          "fileSize": "0.2 MB",
+          "dimensions": {
+            "width": 800,
+            "height": 600
+          }
+        },
+        "gallery": [],
+        "videos": [],
+        "audio": [],
+        "documents": []
+      },
+      "metadata": {
+        "createdAt": "2025-08-21T11:38:58.936Z",
+        "updatedAt": "2025-08-21T11:38:58.936Z",
+        "createdBy": "admin",
+        "status": "active",
+        "tags": [
+          "s"
+        ],
+        "priority": "medium",
+        "verificationStatus": "pending"
+      },
+      "statistics": {
+        "views": 0,
+        "downloads": 0,
+        "shares": 0,
+        "memorialCandles": 0
+      }
+    },
+    {
+      "id": "martyr_1755776403288_864",
+      "personalInfo": {
+        "name": "s",
+        "arabicName": "s",
+        "englishName": "s",
+        "dateOfBirth": "2025-08-04",
+        "placeOfBirth": "s",
+        "nationality": "فلسطينيs",
+        "martyrdomDate": "2025-08-07",
+        "martyrdomPlace": "s",
+        "martyrdomCircumstances": "s",
+        "age": 0
+      },
+      "familyInfo": {
+        "fatherName": "s",
+        "motherName": "s",
+        "siblings": [
+          "s"
+        ],
+        "spouse": "s",
+        "children": [
+          "s"
+        ]
+      },
+      "biography": {
+        "education": "s",
+        "occupation": "s",
+        "achievements": [
+          "s"
+        ],
+        "interests": [
+          "s"
+        ],
+        "testament": "s"
+      },
+      "mediaAssets": {
+        "profileImage": {
+          "id": "profile_martyr_1755776403288_864_1755776404069",
+          "path": "martyrs/martyr_1755776403288_864/profile/profile-1755776403288-tabbarexample.jpg",
+          "url": "https://storage.googleapis.com/steam-canto-461415-s4-images/1755776403448-profile-1755776403288-tabbarexample.jpg",
+          "altText": "صورة الشهيد martyr_1755776403288_864",
+          "uploadedAt": "2025-08-21T11:40:04.069Z",
+          "fileSize": "0.0 MB",
+          "dimensions": {
+            "width": 800,
+            "height": 600
+          }
+        },
+        "gallery": [],
+        "videos": [],
+        "audio": [],
+        "documents": []
+      },
+      "metadata": {
+        "createdAt": "2025-08-21T11:40:04.069Z",
+        "updatedAt": "2025-08-21T11:40:04.069Z",
+        "createdBy": "admin",
+        "status": "active",
+        "tags": [
+          "s"
+        ],
+        "priority": "medium",
+        "verificationStatus": "pending"
+      },
+      "statistics": {
+        "views": 0,
+        "downloads": 0,
+        "shares": 0,
+        "memorialCandles": 0
+      }
+    }
+  ],
+  "metadata": {
+    "totalCount": 7,
+    "lastUpdated": "2025-08-21T11:40:04.069Z",
+    "version": "1.0.0",
+    "schema": {
+      "martyrId": "unique identifier for each martyr",
+      "filePaths": "organized storage paths for different media types",
+      "storageStructure": {
+        "martyrs": "root folder for all martyr data",
+        "martyr_id": "individual martyr folder",
+        "profile": "profile images",
+        "gallery": "additional photos",
+        "audio": "audio recordings",
+        "documents": "PDFs and other documents"
+      }
+    }
+  }
+}

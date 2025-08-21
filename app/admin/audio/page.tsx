@@ -34,17 +34,24 @@ export default function AudioManagementPage() {
         const res = await fetch('/api/media-kit/audio')
         if (!res.ok) return
         const data = await res.json()
-        const mapped: AudioFile[] = (data.audioFiles ?? []).map((a: any) => ({
-          id: a.id,
-          title: a.title,
-          url: a.url,
-          createdAt: a.createdAt || new Date().toISOString(),
-          duration: a.duration,
-          size: a.size,
-          category: a.category,
-          description: a.description,
-          downloads: a.downloads || 0,
-        }))
+        console.log('Raw audio data:', data) // Debug log
+        
+        const mapped: AudioFile[] = (data.audioFiles ?? []).map((a: any) => {
+          console.log('Mapping audio item:', a) // Debug log
+          return {
+            id: String(a.id), // Ensure id is always a string
+            title: a.title,
+            url: a.url,
+            createdAt: a.createdAt || new Date().toISOString(),
+            duration: a.duration,
+            size: a.size,
+            category: a.category,
+            description: a.description,
+            downloads: a.downloads || 0,
+          }
+        })
+        
+        console.log('Mapped audio files:', mapped) // Debug log
         setAudioFiles(mapped)
       } catch (error) {
         console.error('Failed to load audio files:', error)
@@ -81,6 +88,72 @@ export default function AudioManagementPage() {
       toast({
         title: "فشل الحذف",
         description: "حدث خطأ أثناء حذف الملف",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleDownload = async (id: string, title: string) => {
+    console.log('handleDownload called with:', { id, title, idType: typeof id }) // Debug log
+    
+    try {
+      // Ensure id is a string
+      if (typeof id !== 'string') {
+        console.error('Invalid ID type:', typeof id, id)
+        toast({
+          title: "خطأ في المعرف",
+          description: "معرف الملف غير صحيح",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Check if it's a local file (fallback)
+      if (id.startsWith('local-')) {
+        toast({
+          title: "لا يمكن التحميل",
+          description: "هذا الملف محفوظ محلياً ولا يمكن تحميله",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Download the file
+      const response = await fetch(`/api/admin/audio/${id}`)
+      
+      if (!response.ok) {
+        throw new Error('Download failed')
+      }
+
+      // Create blob and download
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${title}.mp3`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      // Update download count
+      setAudioFiles(files => 
+        files.map(file => 
+          file.id === id 
+            ? { ...file, downloads: (file.downloads || 0) + 1 }
+            : file
+        )
+      )
+
+      toast({
+        title: "تم التحميل بنجاح",
+        description: "تم بدء تحميل الملف الصوتي",
+      })
+    } catch (error) {
+      console.error('Download failed:', error)
+      toast({
+        title: "فشل التحميل",
+        description: "حدث خطأ أثناء تحميل الملف",
         variant: "destructive",
       })
     }
@@ -161,7 +234,7 @@ export default function AudioManagementPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {audioFiles.map((file) => (
+                  {audioFiles.filter(file => file && file.id && file.title).map((file) => (
                     <TableRow key={file.id}>
                       <TableCell className="text-white/90">
                         <div>
@@ -207,14 +280,48 @@ export default function AudioManagementPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(file.id)}
-                          className="text-red-400 hover:text-red-500 hover:bg-red-500/10"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              if (file.id) {
+                                handleDownload(file.id, file.title)
+                              } else {
+                                console.error('File ID is missing:', file)
+                                toast({
+                                  title: "خطأ في المعرف",
+                                  description: "معرف الملف مفقود",
+                                  variant: "destructive",
+                                })
+                              }
+                            }}
+                            className="text-blue-400 hover:text-blue-500 hover:bg-blue-500/10"
+                            title="تحميل الملف"
+                          >
+                            <Download className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              if (file.id) {
+                                handleDelete(file.id)
+                              } else {
+                                console.error('File ID is missing:', file)
+                                toast({
+                                  title: "خطأ في المعرف",
+                                  description: "معرف الملف مفقود",
+                                  variant: "destructive",
+                                })
+                              }
+                            }}
+                            className="text-red-400 hover:text-red-500 hover:bg-red-500/10"
+                            title="حذف الملف"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

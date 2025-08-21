@@ -14,7 +14,7 @@ import { Search, Filter, Users, MapPin, Calendar, SortAsc, SortDesc, Grid, List 
 
 // Define Martyr type to match the expected structure from the API
 interface Martyr {
-  id: number
+  id: string
   name: string
   age: number
   location: string
@@ -31,7 +31,7 @@ export default function MartyrsPage() {
     const list = (data && 'martyrs' in data ? data.martyrs : []) as any[]
     return Array.isArray(list)
       ? list.map((martyr: any) => ({
-          id: Number(martyr.id),
+          id: String(martyr.id),
           name: martyr.name,
           age: Number(martyr.age ?? 0),
           location: martyr.location ?? '',
@@ -55,7 +55,14 @@ export default function MartyrsPage() {
 
   // Fetch martyrs via API is now handled in parent components or a shared hook
 
-  const locations = useMemo(() => [...new Set(martyrs.map(m => m.location))].sort(), [martyrs])
+  const locations = useMemo(() => {
+    const uniqueLocations = new Set(
+      martyrs
+        .map(m => (m.location || '').trim())
+        .filter(loc => loc !== '')
+    )
+    return Array.from(uniqueLocations).sort()
+  }, [martyrs])
   const ageRanges = [
     { label: "جميع الأعمار", value: "all" },
     { label: "أقل من 20", value: "under-20" },

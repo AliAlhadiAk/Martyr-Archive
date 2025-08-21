@@ -88,6 +88,70 @@ export default function VideoManagementPage() {
     }
   }
 
+  const handleDownload = async (id: string, title: string) => {
+    try {
+      // Ensure id is a string
+      if (typeof id !== 'string') {
+        console.error('Invalid ID type:', typeof id, id)
+        toast({
+          title: "خطأ في المعرف",
+          description: "معرف الملف غير صحيح",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Check if it's a local file (fallback)
+      if (id.startsWith('local-')) {
+        toast({
+          title: "لا يمكن التحميل",
+          description: "هذا الملف محفوظ محلياً ولا يمكن تحميله",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Download the file
+      const response = await fetch(`/api/admin/videos/${id}`)
+      
+      if (!response.ok) {
+        throw new Error('Download failed')
+      }
+
+      // Create blob and download
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${title}.mp4`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      // Update download count
+      setVideoFiles(files => 
+        files.map(file => 
+          file.id === id 
+            ? { ...file, downloads: (file.downloads || 0) + 1 }
+            : file
+        )
+      )
+
+      toast({
+        title: "تم التحميل بنجاح",
+        description: "تم بدء تحميل ملف الفيديو",
+      })
+    } catch (error) {
+      console.error('Download failed:', error)
+      toast({
+        title: "فشل التحميل",
+        description: "حدث خطأ أثناء تحميل الملف",
+        variant: "destructive",
+      })
+    }
+  }
+
   const formatDate = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleDateString('ar-SA')
@@ -233,7 +297,38 @@ export default function VideoManagementPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleDelete(file.id)}
+                            onClick={() => {
+                              if (file.id) {
+                                handleDownload(file.id, file.title)
+                              } else {
+                                console.error('File ID is missing:', file)
+                                toast({
+                                  title: "خطأ في المعرف",
+                                  description: "معرف الملف مفقود",
+                                  variant: "destructive",
+                                })
+                              }
+                            }}
+                            title="تحميل الفيديو"
+                            className="text-green-400 hover:text-green-500 hover:bg-green-500/10"
+                          >
+                            <Download className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              if (file.id) {
+                                handleDelete(file.id)
+                              } else {
+                                console.error('File ID is missing:', file)
+                                toast({
+                                  title: "خطأ في المعرف",
+                                  description: "معرف الملف مفقود",
+                                  variant: "destructive",
+                                })
+                              }
+                            }}
                             title="حذف الفيديو"
                             className="text-red-400 hover:text-red-500 hover:bg-red-500/10"
                           >

@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { 
 	ArrowLeft, Calendar, MapPin, Heart,
 	Play, Pause, Volume2, VolumeX, Share2, Download, User, Bookmark, BookmarkCheck 
@@ -35,26 +36,15 @@ const AIDescriptionGenerator = dynamic(
 )
 
 interface MartyrPageClientProps {
-	martyr: {
-		id: string
-		name: string
-		age: number
-		location: string
-		martyrdomDate: string
-		image: string
-		story: string
-		testament?: string
-		audioUrl?: string
-		gallery?: string[]
-		timeline?: { date: string; title: string; description?: string }[]
-	}
+	martyr: any
 }
 
-type TabKey = 'overview' | 'media' | 'timeline' | 'related'
 
 export function MartyrPageClient({ martyr }: MartyrPageClientProps) {
+	type TabKey = 'overview' | 'media' | 'timeline' | 'related'
+
+const [activeTab, setActiveTab] = useState<TabKey>('overview')
 	const { toast } = useToast()
-	const [activeTab, setActiveTab] = useState<TabKey>('overview')
 	const [isLiked, setIsLiked] = useState(false)
 	const [isBookmarked, setIsBookmarked] = useState(false)
 	const [showShare, setShowShare] = useState(false)
@@ -67,9 +57,20 @@ export function MartyrPageClient({ martyr }: MartyrPageClientProps) {
 	const [volume, setVolume] = useState(0.9)
 	const [isMuted, setIsMuted] = useState(false)
 
-	const hasAudio = Boolean(martyr.audioUrl)
-	const gallery = Array.isArray(martyr.gallery) ? martyr.gallery : []
+	const hasAudio = Boolean(martyr.audioUrl || martyr?.mediaAssets?.audio?.[0]?.url)
+	const gallery = useMemo(() => {
+		const fromFlat = Array.isArray(martyr.gallery) ? martyr.gallery : []
+		const fromAssets = Array.isArray(martyr?.mediaAssets?.gallery)
+			? martyr.mediaAssets.gallery.map((g: any) => g.url)
+			: []
+		return fromFlat.length ? fromFlat : fromAssets
+	}, [martyr])
 	const timeline = Array.isArray(martyr.timeline) ? martyr.timeline : []
+	const videos = useMemo(() => {
+		return Array.isArray(martyr?.mediaAssets?.videos)
+			? martyr.mediaAssets.videos.map((v: any) => v.url)
+			: []
+	}, [martyr])
 
 	const formattedDuration = useMemo(() => formatTime(duration), [duration])
 	const formattedCurrentTime = useMemo(() => formatTime(currentTime), [currentTime])
@@ -287,18 +288,82 @@ export function MartyrPageClient({ martyr }: MartyrPageClientProps) {
 								{activeTab === 'overview' && (
 									<div className="space-y-6 text-white/85 font-dg-mataryah leading-8">
 										<p>{martyr.story}</p>
-										{martyr.testament && (
-											<>
-												<h2 className="text-xl font-semibold text-white mt-6 mb-3 font-mj-ghalam">الوصية</h2>
-												<p>{martyr.testament}</p>
-											</>
-										)}
+										<Accordion type="single" collapsible className="w-full">
+											<AccordionItem value="personal">
+												<AccordionTrigger className="text-white">المعلومات الشخصية</AccordionTrigger>
+												<AccordionContent>
+													<div className="grid md:grid-cols-2 gap-3 text-white/80">
+														<div>الاسم بالعربية: {martyr?.personalInfo?.arabicName}</div>
+														<div>الاسم بالإنجليزية: {martyr?.personalInfo?.englishName}</div>
+														<div>تاريخ الميلاد: {martyr?.personalInfo?.dateOfBirth}</div>
+														<div>مكان الميلاد: {martyr?.personalInfo?.placeOfBirth}</div>
+														<div>الجنسية: {martyr?.personalInfo?.nationality}</div>
+														<div>تاريخ الاستشهاد: {martyr?.personalInfo?.martyrdomDate}</div>
+														<div>مكان الاستشهاد: {martyr?.personalInfo?.martyrdomPlace}</div>
+														<div>ظروف الاستشهاد: {martyr?.personalInfo?.martyrdomCircumstances}</div>
+													</div>
+												</AccordionContent>
+											</AccordionItem>
+											<AccordionItem value="family">
+												<AccordionTrigger className="text-white">الأسرة</AccordionTrigger>
+												<AccordionContent>
+													<div className="grid md:grid-cols-2 gap-3 text-white/80">
+														<div>اسم الأب: {martyr?.familyInfo?.fatherName}</div>
+														<div>اسم الأم: {martyr?.familyInfo?.motherName}</div>
+														<div>الزوج/الزوجة: {martyr?.familyInfo?.spouse || '—'}</div>
+														<div>الأشقاء: {(martyr?.familyInfo?.siblings || []).join('، ') || '—'}</div>
+														<div>الأبناء: {(martyr?.familyInfo?.children || []).join('، ') || '—'}</div>
+													</div>
+												</AccordionContent>
+											</AccordionItem>
+											<AccordionItem value="bio">
+												<AccordionTrigger className="text-white">السيرة</AccordionTrigger>
+												<AccordionContent>
+													<div className="grid md:grid-cols-2 gap-3 text-white/80">
+														<div>التعليم: {martyr?.biography?.education}</div>
+														<div>المهنة: {martyr?.biography?.occupation}</div>
+														<div>الإنجازات: {(martyr?.biography?.achievements || []).join('، ') || '—'}</div>
+														<div>الاهتمامات: {(martyr?.biography?.interests || []).join('، ') || '—'}</div>
+													</div>
+													{martyr?.biography?.testament && (
+														<div className="mt-4">
+															<h2 className="text-xl font-semibold text-white mt-2 mb-2 font-mj-ghalam">الوصية</h2>
+															<p>{martyr?.biography?.testament}</p>
+														</div>
+													)}
+												</AccordionContent>
+											</AccordionItem>
+											<AccordionItem value="meta">
+												<AccordionTrigger className="text-white">البيانات الوصفية</AccordionTrigger>
+												<AccordionContent>
+													<div className="grid md:grid-cols-2 gap-3 text-white/80">
+														<div>الحالة: {martyr?.metadata?.status}</div>
+														<div>الأولوية: {martyr?.metadata?.priority}</div>
+														<div>التحقق: {martyr?.metadata?.verificationStatus}</div>
+														<div>أضيفت: {martyr?.metadata?.createdAt}</div>
+														<div>آخر تحديث: {martyr?.metadata?.updatedAt}</div>
+														<div>الوسوم: {(martyr?.metadata?.tags || []).join('، ') || '—'}</div>
+													</div>
+												</AccordionContent>
+											</AccordionItem>
+											<AccordionItem value="stats">
+												<AccordionTrigger className="text-white">الإحصاءات</AccordionTrigger>
+												<AccordionContent>
+													<div className="grid md:grid-cols-4 gap-3 text-white/80">
+														<div>المشاهدات: {martyr?.statistics?.views}</div>
+														<div>التحميلات: {martyr?.statistics?.downloads}</div>
+														<div>المشاركات: {martyr?.statistics?.shares}</div>
+														<div>الشموع: {martyr?.statistics?.memorialCandles}</div>
+													</div>
+												</AccordionContent>
+											</AccordionItem>
+										</Accordion>
 									</div>
 								)}
 
 								{activeTab === 'media' && hasAudio && (
 									<div className="mt-4 space-y-4" aria-label="مشغل الصوت">
-										<audio ref={audioRef} src={martyr.audioUrl || undefined} preload="metadata" />
+										<audio ref={audioRef} src={(martyr.audioUrl) || martyr?.mediaAssets?.audio?.[0]?.url || undefined} preload="metadata" />
 										<div className="flex items-center gap-3 text-white/70 text-xs">
 											<span className="tabular-nums min-w-[42px] text-right">{formattedCurrentTime}</span>
 											<div className="flex-1">
@@ -353,7 +418,7 @@ export function MartyrPageClient({ martyr }: MartyrPageClientProps) {
 									<h2 className="text-xl font-semibold text-white font-mj-ghalam">الوسائط</h2>
 									{gallery.length > 0 ? (
 										<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-											{gallery.map((src, i) => (
+											{gallery.map((src: string, i: number) => (
 												<div key={i} className="relative aspect-square rounded overflow-hidden">
 													<Image src={src} alt={`${martyr.name} ${i + 1}`} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" />
 												</div>
@@ -361,6 +426,19 @@ export function MartyrPageClient({ martyr }: MartyrPageClientProps) {
 										</div>
 									) : (
 										<p className="text-white/60">لا توجد صور إضافية.</p>
+									)}
+
+									{videos.length > 0 && (
+										<div className="space-y-2">
+											<h3 className="text-lg font-mj-ghalam text-white">الفيديوهات</h3>
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+												{videos.map((src: string, i: number) => (
+													<video key={i} controls className="w-full rounded border border-white/10">
+														<source src={src} />
+													</video>
+												))}
+											</div>
+										</div>
 									)}
 								</CardContent>
 							</Card>
@@ -372,7 +450,7 @@ export function MartyrPageClient({ martyr }: MartyrPageClientProps) {
 									<h2 className="text-xl font-semibold text-white font-mj-ghalam">الخط الزمني</h2>
 									{timeline.length > 0 ? (
 										<div className="space-y-4">
-											{timeline.map((item, i) => (
+											{timeline.map((item: { date: string; title: string; description?: string }, i: number) => (
 												<div key={i} className="relative pl-6">
 													<div className="absolute right-0 top-1.5 w-2 h-2 rounded-full bg-red-500" />
 													<div className="text-white/70 text-sm">{item.date}</div>
@@ -414,9 +492,9 @@ export function MartyrPageClient({ martyr }: MartyrPageClientProps) {
 						)}
 
 						<div className="flex flex-wrap gap-2">
-							<Badge variant="outline" className="text-white/80 border-white/20">الشهيد</Badge>
-							<Badge variant="outline" className="text-white/80 border-white/20">الذاكرة</Badge>
-							<Badge variant="outline" className="text-white/80 border-white/20">فلسطين</Badge>
+							{(martyr?.metadata?.tags?.length ? martyr.metadata.tags : ['الشهيد','الذاكرة','فلسطين']).map((t: string, i: number) => (
+								<Badge key={`${t}-${i}`} variant="outline" className="text-white/80 border-white/20">{t}</Badge>
+							))}
 						</div>
 					</div>
 				</motion.div>

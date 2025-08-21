@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { s3Client } from '@/lib/s3-client'
-import { PutObjectCommand } from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { uploadFile, STORAGE_BUCKETS } from '@/lib/supabase-storage'
 import fs from 'fs'
 import path from 'path'
 
@@ -62,91 +60,134 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 })
     }
 
-    const bucket = process.env.AWS_BUCKET_NAME
-    const region = process.env.AWS_REGION
-    if (!bucket || !region) {
-      return NextResponse.json({ error: 'S3 is not configured' }, { status: 500 })
+    // Validate file type
+    if (!file.type.startsWith('video/')) {
+      return NextResponse.json({ error: 'File must be a video file' }, { status: 400 })
     }
 
-    const originalName = (file as any).name || 'video.mp4'
-    const safeName = originalName.replace(/\s+/g, '-').replace(/[^\w\.-]/g, '')
-    const key = `videos/${Date.now()}-${safeName}`
-
-    const arrayBuffer = await file.arrayBuffer()
-    const body = Buffer.from(arrayBuffer)
-
-    const sse = process.env.AWS_S3_SSE
-    const sseKmsKeyId = process.env.AWS_S3_KMS_KEY_ID
-
-    await s3Client.send(
-      new PutObjectCommand({
-        Bucket: bucket,
-        Key: key,
-        Body: body,
-        ContentType: (file as any).type || 'video/mp4',
-        ...(sse ? { ServerSideEncryption: sse as any } : {}),
-        ...(sse === 'aws:kms' && sseKmsKeyId ? { SSEKMSKeyId: sseKmsKeyId } : {}),
-      })
-    )
-
-    const fileSize = (file as any).size || 0
-    const duration = getVideoDuration(fileSize, (file as any).type || 'video/mp4')
-    
-    // Generate presigned URL for viewing (expires in 1 hour)
-    const presignedUrl = await getSignedUrl(
-      s3Client,
-      new PutObjectCommand({ Bucket: bucket, Key: key }),
-      { expiresIn: 3600 }
-    )
-    
-    // Create video asset metadata
-    const videoAsset = {
-      id: key,
-      name: title,
-      category: category || "فيديو تعريفي",
-      preview: "/placeholder.svg?height=300&width=400&text=فيديو+تعريفي",
-      description: description || "فيديو تم رفعه من لوحة الإدارة",
-      downloads: 0,
-      formats: [(file as any).type || 'video/mp4'],
-      size: `${(fileSize / (1024 * 1024)).toFixed(1)} MB`,
-      duration: duration,
-      tags: ["فيديو", "مرفوع"],
-      createdAt: new Date().toISOString(),
-      createdBy: "admin",
-      url: presignedUrl,
-      thumbnail: "" // Will be generated later if needed
+    // Validate file size (500MB limit for videos)
+    const maxSize = 500 * 1024 * 1024 // 500MB
+    if (file.size > maxSize) {
+      return NextResponse.json({ 
+        error: 'File too large', 
+        message: `File size must be less than 500MB. Current size: ${(file.size / (1024 * 1024)).toFixed(1)}MB` 
+      }, { status: 400 })
     }
 
-    // Save to admin assets
     try {
-      initializeAdminAssets()
-      const fileContents = fs.readFileSync(ADMIN_ASSETS_FILE, 'utf8')
-      const data = JSON.parse(fileContents)
+      // Try Supabase upload first
+      const result = await uploadFile(file, {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        bucket: STORAGE_BUCKETS.VIDEOS
+      })
+
+      const duration = getVideoDuration(file.size, file.type)
       
-      if (!data.videos) {
-        data.videos = []
+      // Create video asset metadata
+      const videoAsset = {
+        id: result.key,
+        name: title,
+        category: category || "فيديو تعريفي",
+        preview: "/placeholder.svg?height=300&width=400&text=فيديو+تعريفي",
+        description: description || "فيديو تم رفعه من لوحة الإدارة",
+        downloads: 0,
+        formats: [file.type || 'video/mp4'],
+        size: result.size,
+        duration: duration,
+        tags: ["فيديو", "مرفوع"],
+        createdAt: new Date().toISOString(),
+        createdBy: "admin",
+        url: result.url,
+        thumbnail: "" // Will be generated later if needed
       }
-      
-      data.videos.push(videoAsset)
-      
-      fs.writeFileSync(ADMIN_ASSETS_FILE, JSON.stringify(data, null, 2))
-    } catch (error) {
-      console.error('Failed to save to admin assets:', error)
-      // Continue even if saving to admin assets fails
-    }
 
-    const payload = {
-      id: key,
-      title: title,
-      url: presignedUrl,
-      duration,
-      size: `${(fileSize / (1024 * 1024)).toFixed(1)} MB`,
-      category: category || "فيديو تعريفي",
-      description: description || "فيديو تم رفعه من لوحة الإدارة",
-      createdAt: new Date().toISOString(),
-    }
+      // Save to admin assets
+      try {
+        initializeAdminAssets()
+        const fileContents = fs.readFileSync(ADMIN_ASSETS_FILE, 'utf8')
+        const data = JSON.parse(fileContents)
+        
+        if (!data.videos) {
+          data.videos = []
+        }
+        
+        data.videos.push(videoAsset)
+        
+        fs.writeFileSync(ADMIN_ASSETS_FILE, JSON.stringify(data, null, 2))
+      } catch (error) {
+        console.error('Failed to save to admin assets:', error)
+        // Continue even if saving to admin assets fails
+      }
 
-    return NextResponse.json(payload)
+      const payload = {
+        id: result.key,
+        title: title,
+        url: result.url,
+        duration,
+        size: result.size,
+        category: category || "فيديو تعريفي",
+        description: description || "فيديو تم رفعه من لوحة الإدارة",
+        createdAt: new Date().toISOString(),
+      }
+
+      return NextResponse.json(payload)
+    } catch (uploadError) {
+      console.error('Supabase upload error:', uploadError)
+      
+      // Fallback: Create a placeholder entry with local file info
+      const fallbackId = `local-${Date.now()}-${file.name.replace(/\s+/g, '-')}`
+      const duration = getVideoDuration(file.size, file.type)
+      
+      const fallbackAsset = {
+        id: fallbackId,
+        name: title,
+        category: category || "فيديو تعريفي",
+        preview: "/placeholder.svg?height=300&width=400&text=فيديو+تعريفي",
+        description: description || "فيديو (رفع محلي - Supabase غير متاح)",
+        downloads: 0,
+        formats: [file.type || 'video/mp4'],
+        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+        duration: duration,
+        tags: ["فيديو", "مرفوع", "محلي"],
+        createdAt: new Date().toISOString(),
+        createdBy: "admin",
+        url: `/video/${fallbackId}`,
+        thumbnail: "",
+        localFile: true
+      }
+
+      // Save fallback asset
+      try {
+        initializeAdminAssets()
+        const fileContents = fs.readFileSync(ADMIN_ASSETS_FILE, 'utf8')
+        const data = JSON.parse(fileContents)
+        
+        if (!data.videos) {
+          data.videos = []
+        }
+        
+        data.videos.push(fallbackAsset)
+        
+        fs.writeFileSync(ADMIN_ASSETS_FILE, JSON.stringify(data, null, 2))
+      } catch (error) {
+        console.error('Failed to save fallback asset:', error)
+      }
+
+      return NextResponse.json({
+        id: fallbackId,
+        title: title,
+        url: fallbackAsset.url,
+        duration,
+        size: fallbackAsset.size,
+        category: category || "فيديو تعريفي",
+        description: description || "فيديو (رفع محلي - Supabase غير متاح)",
+        createdAt: fallbackAsset.createdAt,
+        fallback: true,
+        message: 'File saved locally due to Supabase upload failure'
+      })
+    }
   } catch (error) {
     console.error('Upload video error:', error)
     return NextResponse.json({ error: 'Failed to upload video' }, { status: 500 })

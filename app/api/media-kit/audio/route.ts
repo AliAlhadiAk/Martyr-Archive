@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server'
-import { s3Client } from '@/lib/s3-client'
-import { ListObjectsV2Command, GetObjectCommand } from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { listFiles, STORAGE_BUCKETS } from '@/lib/supabase-storage'
 import fs from 'fs'
 import path from 'path'
 
@@ -23,20 +21,7 @@ const getAudioDuration = (fileSize: number, format: string): string => {
 
 export async function GET() {
   try {
-    const bucket = process.env.AWS_BUCKET_NAME
-    if (!bucket) {
-      return NextResponse.json({ error: 'S3 bucket not configured' }, { status: 500 })
-    }
-
-    // Get S3 audio files
-    const command = new ListObjectsV2Command({
-      Bucket: bucket,
-      Prefix: 'audio/', // assuming audios are stored in an 'audio' folder
-    })
-
-    const response = await s3Client.send(command)
-    
-    // Get admin assets metadata
+    // Get admin assets metadata first
     let adminAudioAssets: any[] = []
     try {
       if (fs.existsSync(ADMIN_ASSETS_FILE)) {
@@ -47,63 +32,80 @@ export async function GET() {
       console.error('Error reading admin assets:', error)
     }
 
-    // Merge S3 files with admin metadata and generate fresh presigned URLs
-    const audioFiles = await Promise.all(
-      (response.Contents || []).map(async (file) => {
-        const fileName = file.Key?.split('/').pop() || ''
-        const fileId = file.Key || ''
-        
-        // Find matching admin metadata
-        const adminAsset = adminAudioAssets.find(asset => asset.id === fileId)
-        
-        // Generate fresh presigned URL for viewing (expires in 1 hour)
-        let presignedUrl = ''
-        try {
-          const getObjectCommand = new GetObjectCommand({
-            Bucket: bucket,
-            Key: fileId,
-          })
-          presignedUrl = await getSignedUrl(s3Client, getObjectCommand, { expiresIn: 3600 })
-        } catch (error) {
-          console.error('Failed to generate presigned URL for:', fileId, error)
+    // Get Supabase storage files
+    let supabaseFiles: any[] = []
+    try {
+      supabaseFiles = await listFiles(STORAGE_BUCKETS.AUDIO)
+    } catch (error) {
+      console.error('Error listing Supabase files:', error)
+      // Continue with just admin assets if Supabase fails
+    }
+
+    // Merge admin metadata with Supabase files
+    const audioFiles = adminAudioAssets.map(adminAsset => {
+      // Check if file exists in Supabase storage
+      const supabaseFile = supabaseFiles.find(file => file.name === adminAsset.id)
+      
+      if (supabaseFile) {
+        // File exists in Supabase, use admin metadata with Supabase URL
+        return {
+          id: adminAsset.id,
+          title: adminAsset.name,
+          url: adminAsset.url, // This should be the Supabase public URL
+          duration: adminAsset.duration,
+          category: adminAsset.category,
+          description: adminAsset.description,
+          size: adminAsset.size,
+          formats: adminAsset.formats,
+          downloads: adminAsset.downloads || 0,
+          createdAt: adminAsset.createdAt,
+          premium: adminAsset.premium || false,
+          available: true
         }
-        
-        if (adminAsset) {
-          // Use admin metadata if available
-          return {
-            id: adminAsset.id,
-            title: adminAsset.name,
-            url: presignedUrl,
-            duration: adminAsset.duration,
-            category: adminAsset.category,
-            description: adminAsset.description,
-            size: adminAsset.size,
-            formats: adminAsset.formats,
-            downloads: adminAsset.downloads || 0,
-            createdAt: adminAsset.createdAt,
-            premium: adminAsset.premium || false
-          }
-        } else {
-          // Fallback to basic S3 info
-          const fileSize = file.Size || 0
-          const estimatedDuration = getAudioDuration(fileSize, 'audio/mpeg')
-          
-          return {
-            id: fileId,
-            title: fileName.replace(/\.[^.]+$/, ''),
-            url: presignedUrl,
-            duration: estimatedDuration,
-            category: "موسيقى",
-            description: "ملف صوتي متوفر في المكتبة",
-            size: `${(fileSize / (1024 * 1024)).toFixed(1)} MB`,
-            formats: ["MP3"],
-            downloads: 0,
-            createdAt: file.LastModified?.toISOString() || new Date().toISOString(),
-            premium: false
-          }
+      } else {
+        // File not found in Supabase (might be local fallback)
+        return {
+          id: adminAsset.id,
+          title: adminAsset.name,
+          url: adminAsset.url,
+          duration: adminAsset.duration,
+          category: adminAsset.category,
+          description: adminAsset.description,
+          size: adminAsset.size,
+          formats: adminAsset.formats,
+          downloads: adminAsset.downloads || 0,
+          createdAt: adminAsset.createdAt,
+          premium: adminAsset.premium || false,
+          available: adminAsset.localFile || false
         }
-      })
-    )
+      }
+    })
+
+    // Add any Supabase files that don't have admin metadata
+    supabaseFiles.forEach(supabaseFile => {
+      const hasAdminMetadata = adminAudioAssets.some(admin => admin.id === supabaseFile.name)
+      
+      if (!hasAdminMetadata) {
+        // Create basic metadata for files without admin info
+        const fileSize = supabaseFile.size || 0
+        const estimatedDuration = getAudioDuration(fileSize, 'audio/mpeg')
+        
+        audioFiles.push({
+          id: supabaseFile.name,
+          title: supabaseFile.name.replace(/\.[^.]+$/, ''),
+          url: `/api/media-kit/audio/${supabaseFile.name}/download`, // Use download endpoint
+          duration: estimatedDuration,
+          category: "موسيقى",
+          description: "ملف صوتي متوفر في المكتبة",
+          size: `${(fileSize / (1024 * 1024)).toFixed(1)} MB`,
+          formats: ["MP3"],
+          downloads: 0,
+          createdAt: supabaseFile.created_at || new Date().toISOString(),
+          premium: false,
+          available: true
+        })
+      }
+    })
 
     // Sort by creation date (newest first)
     audioFiles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())

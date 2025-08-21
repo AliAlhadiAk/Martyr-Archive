@@ -57,13 +57,31 @@ function AdminPageContent() {
   // Form states for different asset types
   const [martyrForm, setMartyrForm] = useState({
     name: "",
-    age: "",
-    location: "",
+    arabicName: "",
+    englishName: "",
+    dateOfBirth: "",
+    placeOfBirth: "",
+    nationality: "فلسطيني",
     martyrdomDate: "",
+    martyrdomPlace: "",
+    martyrdomCircumstances: "",
+    fatherName: "",
+    motherName: "",
+    siblings: "",
+    spouse: "",
+    children: "",
+    education: "",
+    occupation: "",
+    achievements: "",
+    interests: "",
     story: "",
     testament: "",
-    image: null as File | null,
-    audio: null as File | null
+    tags: "",
+    profileImage: null as File | null,
+    galleryFiles: [] as File[],
+    audioFiles: [] as File[],
+    documentFiles: [] as File[],
+    videoFiles: [] as File[]
   })
 
   const [fontForm, setFontForm] = useState({
@@ -191,18 +209,106 @@ function AdminPageContent() {
       };
 
       if (type === 'martyrs') {
-        newAsset = {
-          ...newAsset,
-          name: formData.name,
-          age: parseInt(formData.age),
-          location: formData.location,
-          martyrdomDate: formData.martyrdomDate, // Keep martyrdomDate for admin, map to 'date' for public
-          story: formData.story,
-          testament: formData.testament,
-          // For now, use placeholder URLs for image and audio files
-          image: formData.image ? `/placeholder.svg?height=400&width=300&text=${encodeURIComponent(formData.name)}` : "/placeholder.svg?height=400&width=300&text=صورة+الشهيد",
-          audioUrl: formData.audio ? `/audio/testament-${newAsset.id}.mp3` : "/audio/placeholder.mp3",
-        };
+        // Use the new comprehensive martyr creation API
+        const formDataToSend = new FormData()
+        
+        // Personal information
+        formDataToSend.append('name', formData.name)
+        formDataToSend.append('arabicName', formData.arabicName)
+        formDataToSend.append('englishName', formData.englishName)
+        formDataToSend.append('dateOfBirth', formData.dateOfBirth)
+        formDataToSend.append('placeOfBirth', formData.placeOfBirth)
+        formDataToSend.append('nationality', formData.nationality)
+        formDataToSend.append('martyrdomDate', formData.martyrdomDate)
+        formDataToSend.append('martyrdomPlace', formData.martyrdomPlace)
+        formDataToSend.append('martyrdomCircumstances', formData.martyrdomCircumstances)
+        
+        // Family information
+        formDataToSend.append('fatherName', formData.fatherName)
+        formDataToSend.append('motherName', formData.motherName)
+        formDataToSend.append('siblings', formData.siblings)
+        formDataToSend.append('spouse', formData.spouse)
+        formDataToSend.append('children', formData.children)
+        
+        // Biography information
+        formDataToSend.append('education', formData.education)
+        formDataToSend.append('occupation', formData.occupation)
+        formDataToSend.append('achievements', formData.achievements)
+        formDataToSend.append('interests', formData.interests)
+        formDataToSend.append('testament', formData.testament)
+        
+        // Tags
+        formDataToSend.append('tags', formData.tags)
+        
+        // Media files
+        if (formData.profileImage) {
+          formDataToSend.append('profileImage', formData.profileImage)
+        }
+        if (formData.galleryFiles && formData.galleryFiles.length > 0) {
+          formData.galleryFiles.forEach((file: File) => {
+            formDataToSend.append('gallery', file)
+          })
+        }
+        if (formData.videoFiles && formData.videoFiles.length > 0) {
+          formData.videoFiles.forEach((file: File) => {
+            formDataToSend.append('videos', file)
+          })
+        }
+        if (formData.audioFiles && formData.audioFiles.length > 0) {
+          formData.audioFiles.forEach((file: File) => {
+            formDataToSend.append('audio', file)
+          })
+        }
+        if (formData.documentFiles && formData.documentFiles.length > 0) {
+          formData.documentFiles.forEach((file: File) => {
+            formDataToSend.append('documents', file)
+          })
+        }
+
+        try {
+          const response = await fetch('/api/admin/martyrs', {
+            method: 'POST',
+            body: formDataToSend
+          })
+
+          if (!response.ok) {
+            throw new Error('Failed to create martyr')
+          }
+
+          const result = await response.json()
+          
+          newAsset = {
+            ...newAsset,
+            name: formData.name,
+            arabicName: formData.arabicName,
+            englishName: formData.englishName,
+            dateOfBirth: formData.dateOfBirth,
+            placeOfBirth: formData.placeOfBirth,
+            martyrdomDate: formData.martyrdomDate,
+            martyrdomPlace: formData.martyrdomPlace,
+            story: formData.story,
+            testament: formData.testament,
+            profileImage: result.martyr?.mediaAssets?.profileImage?.url || "/placeholder.svg?height=400&width=300&text=صورة+الشهيد",
+            galleryCount: result.martyr?.mediaAssets?.galleryCount || 0,
+            audioCount: result.martyr?.mediaAssets?.audioCount || 0,
+            documentsCount: result.martyr?.mediaAssets?.documentsCount || 0
+          }
+        } catch (error) {
+          console.error('Error creating martyr:', error)
+          // Fallback to basic creation if API fails
+          newAsset = {
+            ...newAsset,
+            name: formData.name,
+            arabicName: formData.arabicName,
+            englishName: formData.englishName,
+            dateOfBirth: formData.dateOfBirth,
+            placeOfBirth: formData.placeOfBirth,
+            martyrdomDate: formData.martyrdomDate,
+            story: formData.story,
+            testament: formData.testament,
+            profileImage: "/placeholder.svg?height=400&width=300&text=صورة+الشهيد"
+          }
+        }
       } else if (type === 'fonts') {
         newAsset = {
           ...newAsset,
@@ -295,13 +401,31 @@ function AdminPageContent() {
       case 'martyrs':
         setMartyrForm({
           name: "",
-          age: "",
-          location: "",
+          arabicName: "",
+          englishName: "",
+          dateOfBirth: "",
+          placeOfBirth: "",
+          nationality: "فلسطيني",
           martyrdomDate: "",
+          martyrdomPlace: "",
+          martyrdomCircumstances: "",
+          fatherName: "",
+          motherName: "",
+          siblings: "",
+          spouse: "",
+          children: "",
+          education: "",
+          occupation: "",
+          achievements: "",
+          interests: "",
           story: "",
           testament: "",
-          image: null,
-          audio: null
+          tags: "",
+          profileImage: null,
+          galleryFiles: [],
+          audioFiles: [],
+          documentFiles: [],
+          videoFiles: []
         })
         break
       case 'fonts':
@@ -378,7 +502,9 @@ function AdminPageContent() {
   const handleFileUpload = (type: string, field: string, file: File) => {
     switch (type) {
       case 'martyrs':
-        setMartyrForm(prev => ({ ...prev, [field]: file }))
+        if (field === 'profileImage') {
+          setMartyrForm(prev => ({ ...prev, profileImage: file }))
+        }
         break
       case 'fonts':
         setFontForm(prev => ({ ...prev, [field]: file }))
@@ -399,6 +525,20 @@ function AdminPageContent() {
       case 'audio':
         setAudioForm(prev => ({ ...prev, [field]: file }))
         break
+    }
+  }
+
+  const handleMultipleFilesUpload = (type: string, field: string, files: FileList | null) => {
+    if (type === 'martyrs') {
+      if (field === 'gallery') {
+        setMartyrForm(prev => ({ ...prev, galleryFiles: files ? Array.from(files) : [] }))
+      } else if (field === 'videos') {
+        setMartyrForm(prev => ({ ...prev, videoFiles: files ? Array.from(files) : [] }))
+      } else if (field === 'audio') {
+        setMartyrForm(prev => ({ ...prev, audioFiles: files ? Array.from(files) : [] }))
+      } else if (field === 'documents') {
+        setMartyrForm(prev => ({ ...prev, documentFiles: files ? Array.from(files) : [] }))
+      }
     }
   }
 
@@ -524,27 +664,59 @@ function AdminPageContent() {
                           />
                         </div>
                         <div>
-                          <Label className="text-white/80 font-dg-mataryah">العمر</Label>
+                          <Label className="text-white/80 font-dg-mataryah">الاسم بالعربية</Label>
                           <Input
-                            type="number"
-                            value={martyrForm.age}
-                            onChange={(e) => setMartyrForm(prev => ({ ...prev, age: e.target.value }))}
+                            value={martyrForm.arabicName}
+                            onChange={(e) => setMartyrForm(prev => ({ ...prev, arabicName: e.target.value }))}
                             className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
-                            placeholder="العمر"
+                            placeholder="الاسم بالعربية"
                           />
                         </div>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                          <Label className="text-white/80 font-dg-mataryah">المنطقة</Label>
+                          <Label className="text-white/80 font-dg-mataryah">الاسم بالإنجليزية</Label>
                           <Input
-                            value={martyrForm.location}
-                            onChange={(e) => setMartyrForm(prev => ({ ...prev, location: e.target.value }))}
+                            value={martyrForm.englishName}
+                            onChange={(e) => setMartyrForm(prev => ({ ...prev, englishName: e.target.value }))}
                             className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
-                            placeholder="المنطقة أو المدينة"
+                            placeholder="English Name"
                           />
                         </div>
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">تاريخ الميلاد</Label>
+                          <Input
+                            type="date"
+                            value={martyrForm.dateOfBirth}
+                            onChange={(e) => setMartyrForm(prev => ({ ...prev, dateOfBirth: e.target.value }))}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">مكان الميلاد</Label>
+                          <Input
+                            value={martyrForm.placeOfBirth}
+                            onChange={(e) => setMartyrForm(prev => ({ ...prev, placeOfBirth: e.target.value }))}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                            placeholder="مكان الميلاد"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">الجنسية</Label>
+                          <Input
+                            value={martyrForm.nationality}
+                            onChange={(e) => setMartyrForm(prev => ({ ...prev, nationality: e.target.value }))}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                            placeholder="الجنسية"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
                         <div>
                           <Label className="text-white/80 font-dg-mataryah">تاريخ الاستشهاد</Label>
                           <Input
@@ -554,6 +726,25 @@ function AdminPageContent() {
                             className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
                           />
                         </div>
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">مكان الاستشهاد</Label>
+                          <Input
+                            value={martyrForm.martyrdomPlace}
+                            onChange={(e) => setMartyrForm(prev => ({ ...prev, martyrdomPlace: e.target.value }))}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                            placeholder="مكان الاستشهاد"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-white/80 font-dg-mataryah">ظروف الاستشهاد</Label>
+                        <Input
+                          value={martyrForm.martyrdomCircumstances}
+                          onChange={(e) => setMartyrForm(prev => ({ ...prev, martyrdomCircumstances: e.target.value }))}
+                          className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                          placeholder="ظروف الاستشهاد"
+                        />
                       </div>
 
                       <div>
@@ -567,6 +758,105 @@ function AdminPageContent() {
                         />
                       </div>
 
+                      {/* Family Information */}
+                      <div className="border-t border-white/20 pt-6">
+                        <h4 className="text-lg font-bold text-white mb-4 font-mj-ghalam">معلومات العائلة</h4>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-white/80 font-dg-mataryah">اسم الأب</Label>
+                            <Input
+                              value={martyrForm.fatherName}
+                              onChange={(e) => setMartyrForm(prev => ({ ...prev, fatherName: e.target.value }))}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                              placeholder="اسم الأب"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-white/80 font-dg-mataryah">اسم الأم</Label>
+                            <Input
+                              value={martyrForm.motherName}
+                              onChange={(e) => setMartyrForm(prev => ({ ...prev, motherName: e.target.value }))}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                              placeholder="اسم الأم"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4 mt-4">
+                          <div>
+                            <Label className="text-white/80 font-dg-mataryah">الإخوة (مفصولة بفواصل)</Label>
+                            <Input
+                              value={martyrForm.siblings}
+                              onChange={(e) => setMartyrForm(prev => ({ ...prev, siblings: e.target.value }))}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                              placeholder="أحمد، فاطمة، علي"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-white/80 font-dg-mataryah">الزوج/ة</Label>
+                            <Input
+                              value={martyrForm.spouse}
+                              onChange={(e) => setMartyrForm(prev => ({ ...prev, spouse: e.target.value }))}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                              placeholder="اسم الزوج/ة (اختياري)"
+                            />
+                          </div>
+                        </div>
+                        <div className="mt-4">
+                          <Label className="text-white/80 font-dg-mataryah">الأبناء (مفصولة بفواصل)</Label>
+                          <Input
+                            value={martyrForm.children}
+                            onChange={(e) => setMartyrForm(prev => ({ ...prev, children: e.target.value }))}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                            placeholder="محمد، سارة، أحمد"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Biography Information */}
+                      <div className="border-t border-white/20 pt-6">
+                        <h4 className="text-lg font-bold text-white mb-4 font-mj-ghalam">المعلومات الشخصية</h4>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-white/80 font-dg-mataryah">التعليم</Label>
+                            <Input
+                              value={martyrForm.education}
+                              onChange={(e) => setMartyrForm(prev => ({ ...prev, education: e.target.value }))}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                              placeholder="مستوى التعليم"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-white/80 font-dg-mataryah">المهنة</Label>
+                            <Input
+                              value={martyrForm.occupation}
+                              onChange={(e) => setMartyrForm(prev => ({ ...prev, occupation: e.target.value }))}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                              placeholder="المهنة"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4 mt-4">
+                          <div>
+                            <Label className="text-white/80 font-dg-mataryah">الإنجازات (مفصولة بفواصل)</Label>
+                            <Input
+                              value={martyrForm.achievements}
+                              onChange={(e) => setMartyrForm(prev => ({ ...prev, achievements: e.target.value }))}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                              placeholder="إنجاز 1، إنجاز 2"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-white/80 font-dg-mataryah">الاهتمامات (مفصولة بفواصل)</Label>
+                            <Input
+                              value={martyrForm.interests}
+                              onChange={(e) => setMartyrForm(prev => ({ ...prev, interests: e.target.value }))}
+                              className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                              placeholder="القراءة، الرياضة"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
                       <div>
                         <Label className="text-white/80 font-dg-mataryah">الوصية</Label>
                         <Textarea
@@ -578,6 +868,16 @@ function AdminPageContent() {
                         />
                       </div>
 
+                      <div>
+                        <Label className="text-white/80 font-dg-mataryah">الوسوم (مفصولة بفواصل)</Label>
+                        <Input
+                          value={martyrForm.tags}
+                          onChange={(e) => setMartyrForm(prev => ({ ...prev, tags: e.target.value }))}
+                          className="bg-white/10 border-white/20 text-white placeholder:text-white/50 font-dg-mataryah"
+                          placeholder="شهيد، ذكرى، فلسطين، مقاومة"
+                        />
+                      </div>
+
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
                           <Label className="text-white/80 font-dg-mataryah">صورة الشهيد</Label>
@@ -585,11 +885,11 @@ function AdminPageContent() {
                             <input
                               type="file"
                               accept="image/*"
-                              onChange={(e) => handleFileUpload('martyrs', 'image', e.target.files?.[0]!)}
+                              onChange={(e) => handleFileUpload('martyrs', 'profileImage', e.target.files?.[0]!)}
                               className="hidden"
-                              id="martyr-image"
+                              id="martyr-profile-image"
                             />
-                            <label htmlFor="martyr-image" className="cursor-pointer">
+                            <label htmlFor="martyr-profile-image" className="cursor-pointer">
                               <Upload className="w-8 h-8 text-white/60 mx-auto mb-2" />
                               <p className="text-white/80 text-sm font-dg-mataryah">رفع صورة</p>
                             </label>
@@ -601,13 +901,79 @@ function AdminPageContent() {
                             <input
                               type="file"
                               accept="audio/*"
-                              onChange={(e) => handleFileUpload('martyrs', 'audio', e.target.files?.[0]!)}
+                              multiple
+                              onChange={(e) => handleMultipleFilesUpload('martyrs', 'audio', e.target.files)}
                               className="hidden"
                               id="martyr-audio"
                             />
                             <label htmlFor="martyr-audio" className="cursor-pointer">
                               <Upload className="w-8 h-8 text-white/60 mx-auto mb-2" />
-                              <p className="text-white/80 text-sm font-dg-mataryah">رفع صوت</p>
+                              <p className="text-white/80 text-sm font-dg-mataryah">
+                                {martyrForm.audioFiles?.length ? `تم اختيار ${martyrForm.audioFiles.length} ملف صوتي` : 'رفع ملفات صوتية'}
+                              </p>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">صور إضافية (المعرض)</Label>
+                          <div className="border-2 border-dashed border-white/20 rounded-lg p-4 text-center">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              onChange={(e) => handleMultipleFilesUpload('martyrs', 'gallery', e.target.files)}
+                              className="hidden"
+                              id="martyr-gallery"
+                            />
+                            <label htmlFor="martyr-gallery" className="cursor-pointer">
+                              <Upload className="w-8 h-8 text-white/60 mx-auto mb-2" />
+                              <p className="text-white/80 text-sm font-dg-mataryah">
+                                {martyrForm.galleryFiles?.length ? `تم اختيار ${martyrForm.galleryFiles.length} صورة` : 'رفع صور للمعرض'}
+                              </p>
+                            </label>
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">فيديوهات</Label>
+                          <div className="border-2 border-dashed border-white/20 rounded-lg p-4 text-center">
+                            <input
+                              type="file"
+                              accept="video/*"
+                              multiple
+                              onChange={(e) => handleMultipleFilesUpload('martyrs', 'videos', e.target.files)}
+                              className="hidden"
+                              id="martyr-videos"
+                            />
+                            <label htmlFor="martyr-videos" className="cursor-pointer">
+                              <Upload className="w-8 h-8 text-white/60 mx-auto mb-2" />
+                              <p className="text-white/80 text-sm font-dg-mataryah">
+                                {martyrForm.videoFiles?.length ? `تم اختيار ${martyrForm.videoFiles.length} فيديو` : 'رفع فيديوهات'}
+                              </p>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-white/80 font-dg-mataryah">مستندات</Label>
+                          <div className="border-2 border-dashed border-white/20 rounded-lg p-4 text-center">
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx,.txt"
+                              multiple
+                              onChange={(e) => handleMultipleFilesUpload('martyrs', 'documents', e.target.files)}
+                              className="hidden"
+                              id="martyr-documents"
+                            />
+                            <label htmlFor="martyr-documents" className="cursor-pointer">
+                              <Upload className="w-8 h-8 text-white/60 mx-auto mb-2" />
+                              <p className="text-white/80 text-sm font-dg-mataryah">
+                                {martyrForm.documentFiles?.length ? `تم اختيار ${martyrForm.documentFiles.length} مستند` : 'رفع مستندات'}
+                              </p>
                             </label>
                           </div>
                         </div>
