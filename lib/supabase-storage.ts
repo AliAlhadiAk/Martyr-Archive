@@ -16,7 +16,9 @@ export type StorageBucket = typeof STORAGE_BUCKETS[keyof typeof STORAGE_BUCKETS]
 const keyFilename = path.join(process.cwd(), 'steam-canto-461415-s4-49cb45451bdf.json')
 
 const storage = new Storage({
-  ...(keyFilename ? { keyFilename } : {}),
+  credentials: process.env.GOOGLE_SERVICE_ACCOUNT
+    ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT)
+    : undefined,
 })
 
 // Derive project-scoped unique bucket names

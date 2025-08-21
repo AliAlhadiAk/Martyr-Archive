@@ -535,11 +535,83 @@
         "shares": 0,
         "memorialCandles": 0
       }
+    },
+    {
+      "id": "martyr_1755780294127_783",
+      "personalInfo": {
+        "name": "as",
+        "arabicName": "f",
+        "englishName": "f",
+        "dateOfBirth": "2025-08-04",
+        "placeOfBirth": "f",
+        "nationality": "فلسطيني",
+        "martyrdomDate": "2025-09-03",
+        "martyrdomPlace": "f",
+        "martyrdomCircumstances": "f",
+        "age": 0
+      },
+      "familyInfo": {
+        "fatherName": "f",
+        "motherName": "f",
+        "siblings": [
+          "f"
+        ],
+        "spouse": "f",
+        "children": [
+          "f"
+        ]
+      },
+      "biography": {
+        "education": "f",
+        "occupation": "f",
+        "achievements": [
+          "f"
+        ],
+        "interests": [
+          "f"
+        ],
+        "testament": "f"
+      },
+      "mediaAssets": {
+        "profileImage": {
+          "id": "profile_martyr_1755780294127_783_1755780295287",
+          "path": "martyrs/martyr_1755780294127_783/profile/profile-1755780294127-discover-(1).png",
+          "url": "https://storage.googleapis.com/steam-canto-461415-s4-images/1755780294632-profile-1755780294127-discover-1.png",
+          "altText": "صورة الشهيد martyr_1755780294127_783",
+          "uploadedAt": "2025-08-21T12:44:55.287Z",
+          "fileSize": "0.0 MB",
+          "dimensions": {
+            "width": 800,
+            "height": 600
+          }
+        },
+        "gallery": [],
+        "videos": [],
+        "audio": [],
+        "documents": []
+      },
+      "metadata": {
+        "createdAt": "2025-08-21T12:44:55.287Z",
+        "updatedAt": "2025-08-21T12:44:55.287Z",
+        "createdBy": "admin",
+        "status": "active",
+        "tags": [
+          "f"
+        ],
+        "priority": "medium",
+        "verificationStatus": "pending"
+      },
+      "statistics": {
+        "views": 0,
+        "downloads": 0,
+        "shares": 0,
+        "memorialCandles": 0
+      }
     }
   ],
   "metadata": {
-    "totalCount": 7,
-    "lastUpdated": "2025-08-21T11:40:04.069Z",
+    "totalCount": 8,
+    "lastUpdated": "2025-08-21T12:44:55.287Z",
     "version": "1.0.0",
     "schema": {
       "martyrId": "unique identifier for each martyr",
