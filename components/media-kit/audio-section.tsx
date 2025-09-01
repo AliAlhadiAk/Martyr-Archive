@@ -1,15 +1,21 @@
 "use client"
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Download, PlayCircle, PauseCircle, Link as LinkIcon, Volume2 } from 'lucide-react'
+import { Download, PlayCircle, PauseCircle, Link as LinkIcon } from 'lucide-react'
+import Link from 'next/link'
 
 interface AudioFile {
   id: string
   title: string
   url: string
   duration: string
+  martyrId?: string
+  martyrName?: string
+  martyrImage?: string
+  martyrdomDate?: string
+  tags?: string[]
 }
 
 export function AudioSection({ audioFiles }: { audioFiles: AudioFile[] }) {
@@ -73,14 +79,42 @@ export function AudioSection({ audioFiles }: { audioFiles: AudioFile[] }) {
       <h2 className="text-2xl font-bold text-white mb-6 font-mj-ghalam">
         المقاطع الصوتية
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {audioFiles.map((audio) => (
           <Card key={audio.id} className="bg-white/5 border-white/10">
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg text-white font-dg-mataryah">{audio.title}</h3>
-                <span className="text-sm text-white/60">{audio.duration}</span>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-white/10 flex-shrink-0">
+                    {audio.martyrImage ? (
+                      <img src={audio.martyrImage} alt={audio.martyrName || audio.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    {audio.martyrId ? (
+                      <Link href={`/martyr/${audio.martyrId}`} className="block text-white font-dg-mataryah truncate hover:underline">
+                        {audio.martyrName || audio.title}
+                      </Link>
+                    ) : (
+                      <h3 className="text-white font-dg-mataryah truncate">{audio.martyrName || audio.title}</h3>
+                    )}
+                    <div className="text-white/60 text-xs truncate">
+                      {audio.martyrdomDate || ''}
+                    </div>
+                  </div>
+                </div>
+                <span className="text-xs sm:text-sm text-white/60 flex-shrink-0">{audio.duration}</span>
               </div>
+
+              {audio.tags && audio.tags.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {audio.tags.slice(0, 3).map((tag) => (
+                    <span key={tag} className="px-2 py-0.5 rounded-md bg-white/10 text-white/70 text-xs">{tag}</span>
+                  ))}
+                </div>
+              )}
 
               <audio
                 ref={(el) => {

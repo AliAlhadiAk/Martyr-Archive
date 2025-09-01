@@ -62,7 +62,7 @@ export function InteractiveMartyrCardFixed({ martyr, index }: InteractiveMartyrC
           {/* Image Section */}
           <div className="relative h-64 overflow-hidden">
             <Image
-              src={martyr.image || "/placeholder.svg"}
+              src={"/placeholder.svg"}
               alt={martyr.name}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"

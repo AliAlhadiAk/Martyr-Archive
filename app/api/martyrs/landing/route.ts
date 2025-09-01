@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { martyrService } from '@/lib/martyr-service'
 
+// Cache this route for better performance
+export const revalidate = 300 // 5 minutes
+
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url)
-    const limit = searchParams.get('limit')
     const allMartyrs = await martyrService.getAllMartyrs()
     
-    // If limit is specified, only return that many martyrs
-    const martyrs = limit ? allMartyrs.slice(0, parseInt(limit)) : allMartyrs
+    // Only return 5 martyrs for the landing page
+    const landingMartyrs = allMartyrs.slice(0, 5)
     
-    const list = martyrs.map((m) => ({
+    const list = landingMartyrs.map((m) => ({
       id: m.id,
       name: m.personalInfo.name,
       age: m.personalInfo.age,
@@ -22,20 +23,24 @@ export async function GET(req: NextRequest) {
       audioUrl: m.mediaAssets.audio[0]?.url,
     }))
     
-    return NextResponse.json({ 
+    // Add cache headers for better performance
+    const response = NextResponse.json({ 
       martyrs: list,
       total: allMartyrs.length,
-      returned: list.length
+      returned: list.length,
+      cached: true
     })
+    
+    // Set cache headers
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600')
+    response.headers.set('CDN-Cache-Control', 'public, max-age=300')
+    
+    return response
   } catch (error: any) {
-    console.error('API Error:', error)
+    console.error('Landing API Error:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch martyrs', details: error.message },
+      { error: 'Failed to fetch landing martyrs', details: error.message },
       { status: 500 }
     )
   }
 }
-
-// POST, PUT, DELETE methods for martyrs would typically be handled by the admin API,
-// but if direct manipulation is needed, they would go here.
-// For now, we rely on the /api/admin/assets endpoint for CUD operations.
