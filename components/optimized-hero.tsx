@@ -1,14 +1,13 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useCallback, useMemo, useRef, memo } from "react"
+import { useState, useEffect, useCallback, useMemo, useRef, memo, Suspense } from "react"
 import Image from "next/image"
-import { Search, Heart, Star, Users, Play, Volume2, VolumeX, Sparkles, Download, Camera, Video, FileText, Trophy, Wand2 } from 'lucide-react'
+import { Heart, Star, Users, Play, Volume2, VolumeX, Sparkles, Download, Camera, Video, FileText, Trophy, Wand2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { motion, AnimatePresence } from "framer-motion"
-import { useMartyrs } from "@/hooks/use-martyrs"
+import { LandingSearch } from "@/components/landing-search"
+import { useLandingMartyrs } from "@/hooks/use-martyrs"
 
 interface Martyr {
   id: string;
@@ -22,14 +21,20 @@ interface Martyr {
   audioUrl: string;
 }
 
-// Memoized time component to prevent unnecessary re-renders
+// Lightweight skeleton loader
+const HeroSkeleton = memo(() => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-black">
+    <div className="text-center">
+      <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4" />
+      <div className="text-white/70 text-lg font-dg-mataryah">جاري التحميل...</div>
+    </div>
+  </div>
+))
+HeroSkeleton.displayName = 'HeroSkeleton'
+
+// Memoized time component with reduced re-renders
 const TimeDisplay = memo(({ currentTime }: { currentTime: Date }) => (
-  <motion.div
-    className="text-center mt-8 px-4"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 1, delay: 1.5 }}
-  >
+  <div className="text-center mt-8 px-4">
     <div className="bg-white/10 backdrop-blur-xl rounded-xl p-4 max-w-sm mx-auto border border-white/20">
       <div className="text-lg sm:text-xl font-bold text-white mb-1 font-entezar2">
         {currentTime.toLocaleTimeString("ar-EG")}
@@ -43,19 +48,13 @@ const TimeDisplay = memo(({ currentTime }: { currentTime: Date }) => (
         })}
       </div>
     </div>
-  </motion.div>
+  </div>
 ))
-
 TimeDisplay.displayName = 'TimeDisplay'
 
-// Memoized stats component
+// Lightweight stats component
 const StatsDisplay = memo(({ martyrsCount }: { martyrsCount: number }) => (
-  <motion.div
-    className="flex justify-center items-center gap-4 sm:gap-8 mb-12 text-white/80 text-sm sm:text-base"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 1, delay: 1.3 }}
-  >
+  <div className="flex justify-center items-center gap-4 sm:gap-8 mb-12 text-white/80 text-sm sm:text-base">
     <div className="text-center">
       <div className="text-xl sm:text-2xl font-bold font-entezar2">
         {martyrsCount.toLocaleString()}
@@ -72,12 +71,11 @@ const StatsDisplay = memo(({ martyrsCount }: { martyrsCount: number }) => (
       <div className="text-xl sm:text-2xl font-bold font-entezar2">1,234</div>
       <div className="text-xs sm:text-sm font-dg-mataryah">قصة</div>
     </div>
-  </motion.div>
+  </div>
 ))
-
 StatsDisplay.displayName = 'StatsDisplay'
 
-// AI Description Generator Component
+// Simplified AI Description Generator
 const AIDescriptionGenerator = memo(() => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedText, setGeneratedText] = useState("")
@@ -88,9 +86,9 @@ const AIDescriptionGenerator = memo(() => {
     
     setIsGenerating(true)
     try {
-      // Simulate AI generation (replace with actual API call)
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      setGeneratedText(`تم إنتاج وصف ذكي للشهيد بناءً على: "${inputPrompt}"\n\nهذا وصف تم إنشاؤه بالذكاء الاصطناعي يحتوي على تفاصيل مؤثرة ومناسبة لمنصات التواصل الاجتماعي والإعلام.`)
+      // Simulate AI generation
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setGeneratedText(`تم إنتاج وصف ذكي للشهيد بناءً على: "${inputPrompt}"`)
     } catch (error) {
       console.error('Error generating description:', error)
     } finally {
@@ -99,29 +97,24 @@ const AIDescriptionGenerator = memo(() => {
   }, [inputPrompt])
 
   return (
-    <motion.div
-      className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-purple-400/30 max-w-4xl mx-auto mb-8"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6, delay: 1.4 }}
-    >
+    <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-purple-400/30 max-w-4xl mx-auto mb-8">
       <div className="text-center mb-6">
         <div className="flex items-center justify-center gap-2 mb-3">
-          <Sparkles className="w-6 h-6 text-yellow-400 animate-pulse" />
+          <Sparkles className="w-6 h-6 text-yellow-400" />
           <h3 className="text-2xl sm:text-3xl font-bold text-white font-mj-ghalam">
             مولّد الوصف بالذكاء الاصطناعي
           </h3>
-          <Wand2 className="w-6 h-6 text-purple-400 animate-bounce" />
+          <Wand2 className="w-6 h-6 text-purple-400" />
         </div>
         <p className="text-white/80 text-sm sm:text-base font-entezar5">
-          أداة مجانية لإنتاج أوصاف مؤثرة ومناسبة للشهداء لاستخدامها في الإعلام ومنصات التواصل
+          أداة مجانية لإنتاج أوصاف مؤثرة ومناسبة للشهداء
         </p>
       </div>
 
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <Input
-            placeholder="اكتب معلومات أساسية عن الشهيد (الاسم، العمر، المنطقة، إلخ)..."
+            placeholder="اكتب معلومات أساسية عن الشهيد..."
             value={inputPrompt}
             onChange={(e) => setInputPrompt(e.target.value)}
             className="bg-white/10 backdrop-blur-xl text-white placeholder:text-white/60 border-white/20 h-12 text-base rounded-xl font-dg-mataryah flex-1"
@@ -146,41 +139,33 @@ const AIDescriptionGenerator = memo(() => {
           </Button>
         </div>
 
-        <AnimatePresence>
-          {generatedText && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="bg-white/10 rounded-xl p-4 overflow-hidden"
-            >
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-yellow-400 text-sm font-bold font-dg-mataryah">
-                  الوصف المُنتج:
-                </span>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-white/70 hover:text-white hover:bg-white/10 h-8 px-3"
-                  onClick={() => navigator.clipboard.writeText(generatedText)}
-                >
-                  نسخ النص
-                </Button>
-              </div>
-              <p className="text-white/90 text-sm leading-relaxed font-entezar5 whitespace-pre-line">
-                {generatedText}
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {generatedText && (
+          <div className="bg-white/10 rounded-xl p-4">
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-yellow-400 text-sm font-bold font-dg-mataryah">
+                الوصف المُنتج:
+              </span>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-white/70 hover:text-white hover:bg-white/10 h-8 px-3"
+                onClick={() => navigator.clipboard.writeText(generatedText)}
+              >
+                نسخ النص
+              </Button>
+            </div>
+            <p className="text-white/90 text-sm leading-relaxed font-entezar5">
+              {generatedText}
+            </p>
+          </div>
+        )}
       </div>
-    </motion.div>
+    </div>
   )
 })
-
 AIDescriptionGenerator.displayName = 'AIDescriptionGenerator'
 
-// Free Templates Section
+// Simplified templates section
 const FreeTemplatesSection = memo(() => {
   const templates = useMemo(() => [
     {
@@ -214,31 +199,22 @@ const FreeTemplatesSection = memo(() => {
   ], [])
 
   return (
-    <motion.div
-      className="max-w-6xl mx-auto mb-12"
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 1.2 }}
-    >
+    <div className="max-w-6xl mx-auto mb-12">
       <div className="text-center mb-8">
         <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 font-mj-ghalam">
           قوالب مجانية احترافية
         </h3>
-        <div className="w-20 h-1 bg-gradient-to-r from-green-500 to-blue-500 mx-auto rounded-full mb-4" />
+        <div className="w-20 h-1 bg-gradient-to-r from-green-500 to-blue-500 mx-auto mb-4" />
         <p className="text-white/80 text-sm sm:text-base font-entezar5 max-w-2xl mx-auto">
-          قوالب تصميم مجانية جاهزة للتحميل والاستخدام المباشر للصحفيين والمصممين
+          قوالب تصميم مجانية جاهزة للتحميل والاستخدام المباشر
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {templates.map((template, index) => (
-          <motion.div
+          <div
             key={template.title}
             className={`bg-gradient-to-br ${template.color} backdrop-blur-xl rounded-xl p-6 border ${template.border} hover:scale-105 transition-all duration-300 cursor-pointer group`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.3 + index * 0.1 }}
-            whileHover={{ y: -5 }}
           >
             <div className="text-center">
               <div className="mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -260,7 +236,7 @@ const FreeTemplatesSection = memo(() => {
                 </Button>
               </div>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
 
@@ -272,21 +248,125 @@ const FreeTemplatesSection = memo(() => {
           عرض جميع القوالب
         </Button>
       </div>
-    </motion.div>
+    </div>
   )
 })
-
 FreeTemplatesSection.displayName = 'FreeTemplatesSection'
 
-export function OptimizedHero() {
-  const [searchQuery, setSearchQuery] = useState("")
+// Featured martyr component
+const FeaturedMartyr = memo(({ martyr }: { martyr: Martyr }) => {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+
+  const toggleAudio = useCallback(() => {
+    setIsAudioPlaying(prev => !prev)
+  }, [])
+
+  return (
+    <div className="max-w-4xl mx-auto mb-12">
+      <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-white/20">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-mj-ghalam">
+            شهيد اليوم
+          </h2>
+          <div className="w-16 h-1 bg-gradient-to-r from-red-500 to-red-700 mx-auto rounded-full" />
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div className="relative">
+            <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-br from-yellow-600 via-orange-500 to-red-600">
+              <div className="absolute inset-4 rounded-lg overflow-hidden">
+                <Image
+                  src={'/placeholder.svg'}
+                  alt={martyr.name}
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            </div>
+          </div>
+          
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 font-mj-ghalam">
+                الشهيد {martyr.name}
+              </h3>
+              <p className="text-white/80 text-sm sm:text-base leading-relaxed font-entezar5">
+                {martyr.story}
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white/10 rounded-lg p-3">
+                <div className="text-yellow-400 text-sm font-bold mb-1 font-dg-mataryah">
+                  العمر
+                </div>
+                <div className="text-white text-lg font-bold font-entezar2">
+                  {martyr.age} سنة
+                </div>
+              </div>
+              <div className="bg-white/10 rounded-lg p-3">
+                <div className="text-yellow-400 text-sm font-bold mb-1 font-dg-mataryah">
+                  المنطقة
+                </div>
+                <div className="text-white text-lg font-bold font-entezar2">
+                  {martyr.location}
+                </div>
+              </div>
+            </div>
+            
+            {martyr.testament && (
+              <div className="bg-white/10 rounded-lg p-4">
+                <div className="text-yellow-400 text-sm font-bold mb-2 font-dg-mataryah">
+                  الوصية
+                </div>
+                <p className="text-white/90 text-sm leading-relaxed font-entezar5">
+                  {martyr.testament}
+                </p>
+              </div>
+            )}
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white flex-1 h-12 font-dg-mataryah"
+                onClick={() => window.location.href = `/martyr/${martyr.id}`}
+              >
+                اقرأ السيرة كاملة
+              </Button>
+              {martyr.audioUrl && (
+                <Button
+                  variant="outline"
+                  className="border-white/30 text-white hover:bg-white/10 bg-transparent h-12 px-6 font-dg-mataryah"
+                  onClick={toggleAudio}
+                >
+                  {isAudioPlaying ? (
+                    <Volume2 className="w-4 h-4 ml-2" />
+                  ) : (
+                    <Play className="w-4 h-4 ml-2" />
+                  )}
+                  استمع للوصية
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+})
+FeaturedMartyr.displayName = 'FeaturedMartyr'
+
+// Main hero component
+export function OptimizedHero() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const timeRef = useRef<NodeJS.Timeout>()
   
-  const { data, isLoading, error } = useMartyrs()
+  // Use the new lightweight hook that only fetches 5 martyrs
+  const { data, isLoading, error } = useLandingMartyrs()
   
-  // Memoize martyrs array with better error handling
+  // Memoize martyrs array
   const martyrs: Martyr[] = useMemo(() => {
     if (!data || !('martyrs' in data) || !Array.isArray(data.martyrs)) {
       return []
@@ -310,7 +390,7 @@ export function OptimizedHero() {
     return martyrs.length > 0 ? martyrs[0] : null
   }, [martyrs])
 
-  // Optimized time update with cleanup
+  // Optimized time update
   useEffect(() => {
     const updateTime = () => setCurrentTime(new Date())
     timeRef.current = setInterval(updateTime, 1000)
@@ -322,46 +402,21 @@ export function OptimizedHero() {
     }
   }, [])
 
-  // Memoized search handler
-  const handleSearch = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault()
-      if (searchQuery.trim()) {
-        console.log("Searching for:", searchQuery)
-        // Implement actual search logic here
-      }
-    },
-    [searchQuery],
-  )
 
-  // Memoized audio toggle
-  const toggleAudio = useCallback(() => {
-    setIsAudioPlaying(prev => !prev)
-    // Implement actual audio control here
-  }, [])
 
-  // Loading state with skeleton
+  // Loading state
   if (isLoading) {
-    return (
-      <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-black">
-        <div className="text-white text-2xl font-dg-mataryah">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-            جاري تحميل الشهداء...
-          </div>
-        </div>
-      </section>
-    )
+    return <HeroSkeleton />
   }
 
   // Error state
   if (error) {
     return (
-      <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-black">
+      <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-black">
         <div className="text-center">
           <div className="text-red-400 text-2xl mb-4 font-dg-mataryah">خطأ في تحميل البيانات</div>
           <Button 
-            onClick={() => window.location.reload()} 
+            onClick={() => window.location.reload(false)} 
             className="bg-red-600 hover:bg-red-700 text-white font-dg-mataryah"
           >
             إعادة المحاولة
@@ -373,193 +428,44 @@ export function OptimizedHero() {
 
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-black">
-      {/* Optimized background effects */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40" />
       
       <div className="container mx-auto px-4 py-20 relative z-10">
         {/* Main Content */}
         <div className="text-center mb-16">
-          <motion.h1
-            className="text-4xl sm:text-6xl lg:text-8xl font-bold text-white mb-6 leading-tight font-adoody"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-          >
+          <h1 className="text-4xl sm:text-6xl lg:text-8xl font-bold text-white mb-6 leading-tight font-adoody">
             الارشيف الرقمي للسعداء
-          </motion.h1>
+          </h1>
           
-          <motion.div
-            className="w-24 sm:w-32 h-1 bg-gradient-to-r from-red-500 to-red-700 mx-auto mb-6 rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: "8rem" }}
-            transition={{ duration: 1.5, delay: 0.5 }}
-          />
+          <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-red-500 to-red-700 mx-auto mb-6 rounded-full" />
           
-          <motion.p
-            className="text-lg sm:text-xl lg:text-2xl text-white/90 mb-8 max-w-4xl mx-auto leading-relaxed px-4 font-entezar5"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.7 }}
-          >
-            منصة أرشيف رقمية لحفظ وتوثيق سير الشهداء. نقدّم بطاقات تعريفية، قصصًا موثّقة، وصوتيات ومواد إعلامية يمكن للصحفيين والمصممين استخدامها. هدفنا إبقاء الذاكرة حيّة وتقديم محتوى موثوق وسهل المشاركة.
-          </motion.p>
+          <p className="text-lg sm:text-xl lg:text-2xl text-white/90 mb-8 max-w-4xl mx-auto leading-relaxed px-4 font-entezar5">
+            منصة أرشيف رقمية لحفظ وتوثيق سير الشهداء. نقدّم بطاقات تعريفية، قصصًا موثّقة، وصوتيات ومواد إعلامية يمكن للصحفيين والمصممين استخدامها.
+          </p>
 
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto mb-10">
             <div className="bg-white/10 rounded-xl p-4 text-white/90 font-dg-mataryah">بطاقات الشهداء مع معلومات وصور</div>
             <div className="bg-white/10 rounded-xl p-4 text-white/90 font-dg-mataryah">رزنامة الاستشهاد حسب اليوم والشهر</div>
             <div className="bg-white/10 rounded-xl p-4 text-white/90 font-dg-mataryah">عدّة إعلام ومولّد وصف بالذكاء الاصطناعي</div>
-          </motion.div>
+          </div>
 
-          {/* Optimized Search */}
-          <motion.form
-            onSubmit={handleSearch}
-            className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto mb-12 px-4"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.9 }}
-          >
-            <div className="relative flex-1">
-              <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/60 w-5 h-5" />
-              <Input
-                placeholder="ابحث عن شهيد، منطقة، أو تاريخ..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-white/10 backdrop-blur-xl text-white placeholder:text-white/60 border-white/20 pr-12 h-12 sm:h-14 text-base sm:text-lg rounded-xl font-dg-mataryah"
-              />
-            </div>
-            <Button
-              type="submit"
-              size="lg"
-              className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white border-0 h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg font-bold rounded-xl font-dg-mataryah"
-            >
-              بحث
-            </Button>
-          </motion.form>
+          {/* Search Form */}
+          <LandingSearch />
 
-          {/* AI Description Generator - NEW FEATURE */}
+          {/* AI Description Generator */}
           <AIDescriptionGenerator />
 
-          {/* Free Templates Section - NEW FEATURE */}
+          {/* Free Templates Section */}
           <FreeTemplatesSection />
 
-          {/* Martyr of the Day */}
-          {featuredMartyr && (
-            <motion.div
-              className="max-w-4xl mx-auto mb-12"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 1.1 }}
-            >
-              <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-white/20">
-                <div className="text-center mb-6">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-mj-ghalam">
-                    شهيد اليوم
-                  </h2>
-                  <div className="w-16 h-1 bg-gradient-to-r from-red-500 to-red-700 mx-auto rounded-full" />
-                </div>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                  {/* Optimized Image Section */}
-                  <div className="relative">
-                    <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-br from-yellow-600 via-orange-500 to-red-600">
-                      <div className="absolute inset-4 rounded-lg overflow-hidden">
-                        <Image
-                          src={featuredMartyr.image}
-                          alt={featuredMartyr.name}
-                          fill
-                          className="object-cover"
-                          priority
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                      </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <div className="absolute bottom-4 left-4 right-4 text-center">
-                        <div className="text-yellow-400 text-lg font-bold mb-1 font-adoody">
-                          شهداء على طبق القدس
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Content Section */}
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 font-mj-ghalam">
-                        الشهيد {featuredMartyr.name}
-                      </h3>
-                      <p className="text-white/80 text-sm sm:text-base leading-relaxed font-entezar5">
-                        {featuredMartyr.story}
-                      </p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-white/10 rounded-lg p-3">
-                        <div className="text-yellow-400 text-sm font-bold mb-1 font-dg-mataryah">
-                          العمر
-                        </div>
-                        <div className="text-white text-lg font-bold font-entezar2">
-                          {featuredMartyr.age} سنة
-                        </div>
-                      </div>
-                      <div className="bg-white/10 rounded-lg p-3">
-                        <div className="text-yellow-400 text-sm font-bold mb-1 font-dg-mataryah">
-                          المنطقة
-                        </div>
-                        <div className="text-white text-lg font-bold font-entezar2">
-                          {featuredMartyr.location}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {featuredMartyr.testament && (
-                      <div className="bg-white/10 rounded-lg p-4">
-                        <div className="text-yellow-400 text-sm font-bold mb-2 font-dg-mataryah">
-                          الوصية
-                        </div>
-                        <p className="text-white/90 text-sm leading-relaxed font-entezar5">
-                          {featuredMartyr.testament}
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <Button
-                        className="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white flex-1 h-12 font-dg-mataryah"
-                        onClick={() => window.location.href = `/martyr/${featuredMartyr.id}`}
-                      >
-                        اقرأ السيرة كاملة
-                      </Button>
-                      {featuredMartyr.audioUrl && (
-                        <Button
-                          variant="outline"
-                          className="border-white/30 text-white hover:bg-white/10 bg-transparent h-12 px-6 font-dg-mataryah"
-                          onClick={toggleAudio}
-                        >
-                          {isAudioPlaying ? (
-                            <Volume2 className="w-4 h-4 ml-2" />
-                          ) : (
-                            <Play className="w-4 h-4 ml-2" />
-                          )}
-                          استمع للوصية
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
+          {/* Featured Martyr */}
+          {featuredMartyr && <FeaturedMartyr martyr={featuredMartyr} />}
 
-          {/* Memoized Stats */}
+          {/* Stats */}
           <StatsDisplay martyrsCount={martyrs.length} />
         </div>
 
-        {/* Memoized Time Display */}
+        {/* Time Display */}
         <TimeDisplay currentTime={currentTime} />
       </div>
     </section>

@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect, useMemo, useDeferredValue } from "react"
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import { ResponsiveNavbar } from "@/components/responsive-navbar"
-import { SharedBackground } from "@/components/shared-background"
+import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -16,8 +16,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { AudioSection } from '@/components/media-kit/audio-section'
-import { VideoSection } from '@/components/media-kit/video-section'
+// Dynamic imports for heavy client-only sections
+const SharedBackground = dynamic(() => import("@/components/shared-background").then(m => m.SharedBackground), { ssr: false, loading: () => null })
+const AudioSection = dynamic(() => import("@/components/media-kit/audio-section").then(m => m.AudioSection), { ssr: false, loading: () => null })
+const VideoSection = dynamic(() => import("@/components/media-kit/video-section").then(m => m.VideoSection), { ssr: false, loading: () => null })
 
 // Define types for fetched assets
 interface FontAsset {
@@ -60,25 +62,27 @@ interface MediaAssets {
 
 
 async function getAudioFiles() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/media-kit/audio`)
+  const res = await fetch(`/api/media-kit/audio`, { cache: 'no-store' })
   if (!res.ok) return []
   const data = await res.json()
   return data.audioFiles
 }
 
 async function getVideoFiles() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/media-kit/videos`)
+  const res = await fetch(`/api/media-kit/videos`, { cache: 'no-store' })
   if (!res.ok) return []
   const data = await res.json()
   return data.videoFiles
 }
 
 export default function MediaKitPage() {
+  const prefersReducedMotion = useReducedMotion()
   const [selectedCategory, setSelectedCategory] = useState("fonts")
   const [selectedFont, setSelectedFont] = useState<number | null>(null)
   const [downloadingItem, setDownloadingItem] = useState<string | null>(null)
   const [copiedText, setCopiedText] = useState<string | null>(null)
   const [previewText, setPreviewText] = useState("الشهداء أحياء عند ربهم يرزقون")
+  const deferredPreview = useDeferredValue(previewText)
   const [mediaData, setMediaData] = useState<MediaAssets>({
     fonts: [],
     designs: [],
@@ -164,16 +168,22 @@ export default function MediaKitPage() {
     })
   }
 
-  // Fetch media assets dynamically
+  // Fetch all data in parallel and commit state once
   useEffect(() => {
-    const fetchMediaAssets = async () => {
-      setIsLoading(true)
+    let active = true
+    setIsLoading(true)
+    ;(async () => {
       try {
-        const response = await fetch('/api/admin/assets')
-        if (response.ok) {
-          const data = await response.json()
-          // Ensure all properties are arrays and map to expected types
-          const mappedData = {
+        const [assetsRes, audioList, videoList] = await Promise.all([
+          fetch('/api/admin/assets', { cache: 'no-store' }),
+          getAudioFiles(),
+          getVideoFiles(),
+        ])
+
+        let mappedData: MediaAssets = { fonts: [], designs: [], posters: [], graphics: [], videos: [], audio: [] }
+        if (assetsRes.ok) {
+          const data = await assetsRes.json()
+          mappedData = {
             fonts: Array.isArray(data.fonts) ? data.fonts.map((font: any) => ({
               id: font.id,
               name: font.name,
@@ -181,16 +191,16 @@ export default function MediaKitPage() {
               fileName: font.fileName,
               category: font.category,
               weight: font.weight,
-              size: font.size || "N/A", // Default if not provided by admin form
-              formats: font.formats || ["TTF"], // Default if not provided
-              preview: font.preview || "الشهداء أحياء عند ربهم يرزقون", // Default
+              size: font.size || "N/A",
+              formats: font.formats || ["TTF"],
+              preview: font.preview || "الشهداء أحياء عند ربهم يرزقون",
               description: font.description,
               downloads: font.downloads || 0,
-              rating: font.rating || 4.5, // Default
+              rating: font.rating || 4.5,
               premium: font.premium,
               gradient: font.gradient,
               fontFamily: font.fontFamily,
-              downloadUrl: font.downloadUrl || `/fonts/${font.fileName}` // Derive or default
+              downloadUrl: font.downloadUrl || `/fonts/${font.fileName}`
             })) : [],
             designs: Array.isArray(data.designs) ? data.designs : [],
             posters: Array.isArray(data.posters) ? data.posters : [],
@@ -198,47 +208,25 @@ export default function MediaKitPage() {
             videos: Array.isArray(data.videos) ? data.videos : [],
             audio: Array.isArray(data.audio) ? data.audio : []
           }
-          setMediaData(mappedData)
-          
-          // Update category counts after media data is loaded
-          updateCategoryCounts(mappedData, audioFiles)
-        } else {
-          console.error("Failed to fetch media assets:", response.statusText)
-          setMediaData({ fonts: [], designs: [], posters: [], graphics: [], videos: [], audio: [] })
         }
-      } catch (error) {
-        console.error("Error fetching media assets:", error)
+
+        if (!active) return
+        setMediaData(mappedData)
+        setAudioFiles(Array.isArray(audioList) ? audioList : [])
+        setVideoFiles(Array.isArray(videoList) ? videoList : [])
+        updateCategoryCounts(mappedData, Array.isArray(audioList) ? audioList : [])
+      } catch (e) {
+        console.error('Failed loading media kit data', e)
+        if (!active) return
         setMediaData({ fonts: [], designs: [], posters: [], graphics: [], videos: [], audio: [] })
+        setAudioFiles([])
+        setVideoFiles([])
       } finally {
-        setIsLoading(false)
+        if (active) setIsLoading(false)
       }
-    }
-    fetchMediaAssets()
+    })()
+    return () => { active = false }
   }, [])
-
-  useEffect(() => {
-    const fetchAudioFiles = async () => {
-      const files = await getAudioFiles()
-      setAudioFiles(files)
-      
-      // Update category counts when audio files are loaded
-      updateCategoryCounts(mediaData, files)
-    }
-
-    fetchAudioFiles()
-  }, [mediaData])
-
-  useEffect(() => {
-    const fetchVideoFiles = async () => {
-      const files = await getVideoFiles()
-      setVideoFiles(files)
-      
-      // Update category counts when video files are loaded
-      updateCategoryCounts(mediaData, audioFiles)
-    }
-
-    fetchVideoFiles()
-  }, [mediaData, audioFiles])
 
   const downloadFont = async (font: FontAsset) => {
     setDownloadingItem(`font-${font.id}`)
@@ -272,11 +260,11 @@ export default function MediaKitPage() {
     setTimeout(() => setCopiedText(null), 2000)
   }
 
-  // Update category counts dynamically
-  const categoriesWithCounts = mediaCategories.map(category => ({
+  // Memoize derived categories with counts
+  const categoriesWithCounts = useMemo(() => mediaCategories.map(category => ({
     ...category,
-    count: mediaData[category.id as keyof MediaAssets]?.length || 0
-  }))
+    count: (mediaData[category.id as keyof MediaAssets] as any[])?.length || 0
+  })), [mediaData])
 
   useEffect(() => {
     // Show dialog after a short delay
@@ -325,7 +313,9 @@ export default function MediaKitPage() {
 
       <main className="min-h-screen bg-black text-white overflow-x-hidden">
         <ResponsiveNavbar />
-        <SharedBackground variant="media" />
+        <div className="hidden sm:block">
+          <SharedBackground variant="media" />
+        </div>
         
         {/* Hero Section */}
         <section className="pt-24 pb-20 relative z-10">        
@@ -364,7 +354,7 @@ export default function MediaKitPage() {
                 
                 <div className="text-left">
                   <motion.h1
-                    className="text-7xl md:text-9xl font-bold text-white font-adoody"
+                    className="text-4xl md:text-7xl lg:text-9xl font-bold text-white font-adoody"
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1 }}
@@ -384,7 +374,7 @@ export default function MediaKitPage() {
                     >
                       <Diamond className="w-6 h-6 text-red-400" />
                     </motion.div>
-                    <span className="text-2xl text-red-300 font-dg-mataryah">مجموعة الأصول الإعلامية الشاملة</span>
+                    <span className="text-lg md:text-2xl text-red-300 font-dg-mataryah">مجموعة الأصول الإعلامية الشاملة</span>
                     <motion.div
                       animate={{
                         scale: [1, 1.3, 1],
@@ -409,7 +399,7 @@ export default function MediaKitPage() {
               />
               
               <motion.p
-                className="text-2xl text-white/80 max-w-5xl mx-auto leading-relaxed font-entezar5"
+                className="text-lg md:text-2xl text-white/80 max-w-5xl mx-auto leading-relaxed font-entezar5"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.7 }}
@@ -419,7 +409,7 @@ export default function MediaKitPage() {
 
               {/* Premium Stats */}
               <motion.div
-                className="flex justify-center items-center gap-12 mt-16"
+                className="flex flex-wrap justify-center items-center gap-6 md:gap-12 mt-16"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 1 }}
@@ -442,8 +432,8 @@ export default function MediaKitPage() {
                     <div className={`w-16 h-16 bg-gradient-to-br ${stat.color} rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-2xl transition-all duration-300`}>
                       <stat.icon className="w-8 h-8 text-white" />
                     </div>
-                    <div className="text-3xl font-bold text-white font-entezar2">{stat.value}</div>
-                    <div className="text-white/60 text-sm font-dg-mataryah">{stat.label}</div>
+                    <div className="text-2xl md:text-3xl font-bold text-white font-entezar2">{stat.value}</div>
+                    <div className="text-white/60 text-xs md:text-sm font-dg-mataryah">{stat.label}</div>
                   </motion.div>
                 ))}
               </motion.div>
@@ -470,7 +460,7 @@ export default function MediaKitPage() {
             </motion.div>
 
             {/* Categories Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16">
               {categoriesWithCounts.map((category, index) => (
                 <motion.div
                   key={category.id}
@@ -493,16 +483,16 @@ export default function MediaKitPage() {
                   <Card className={`bg-white/10 backdrop-blur-xl border-white/20 rounded-2xl overflow-hidden transition-all duration-300 ${
                     selectedCategory === category.id ? 'ring-2 ring-red-500/50 bg-white/20' : 'hover:bg-white/15'
                   }`}>
-                    <CardContent className="p-8 text-center">
+                    <CardContent className="p-6 sm:p-8 text-center">
                       <div className={`w-16 h-16 bg-gradient-to-br ${category.color} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-300`}>
                         <category.icon className="w-8 h-8 text-white" />
                       </div>
                       
-                      <h3 className="text-2xl font-bold text-white mb-3 font-mj-ghalam">
+                      <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 font-mj-ghalam">
                         {category.name}
                       </h3>
                       
-                      <p className="text-white/70 text-sm mb-4 font-dg-mataryah leading-relaxed">
+                      <p className="text-white/70 text-xs sm:text-sm mb-4 font-dg-mataryah leading-relaxed">
                         {category.description}
                       </p>
                       
@@ -554,7 +544,7 @@ export default function MediaKitPage() {
                   </motion.div>
 
                   {/* Fonts Grid */}
-                  <div className="grid lg:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
                     {mediaData.fonts.map((font, index) => (
                       <motion.div
                         key={font.id}
@@ -629,18 +619,18 @@ export default function MediaKitPage() {
                               <div className="relative bg-black/30 backdrop-blur-xl rounded-2xl p-8 border border-white/10 min-h-[120px] flex items-center justify-center">
                                 <motion.p
                                   className={`text-3xl text-center text-white leading-relaxed ${font.fontFamily}`}
-                                  key={previewText}
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ duration: 0.5 }}
+                                  key={deferredPreview}
+                                  initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+                                  animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                                  transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
                                 >
-                                  {previewText}
+                                  {deferredPreview}
                                 </motion.p>
                               </div>
                             </div>
                             
                             {/* Font Details */}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4">
                               <div className="bg-white/10 rounded-xl p-4">
                                 <div className="text-white/60 text-xs font-dg-mataryah mb-1">الوزن</div>
                                 <div className="text-white font-semibold font-entezar2">{font.weight}</div>
@@ -677,7 +667,7 @@ export default function MediaKitPage() {
                             </p>
                             
                             {/* Action Buttons */}
-                            <div className="flex gap-3 pt-4">
+                            <div className="flex gap-2 sm:gap-3 pt-4">
                               <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
@@ -706,7 +696,7 @@ export default function MediaKitPage() {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setSelectedFont(selectedFont === font.id ? null : font.id)}
-                                className="bg-white/10 hover:bg-white/20 text-white p-4 rounded-2xl transition-all duration-300"
+                                className="bg-white/10 hover:bg-white/20 text-white p-3 sm:p-4 rounded-2xl transition-all duration-300"
                               >
                                 <Eye className="w-5 h-5" />
                               </motion.button>
@@ -715,7 +705,7 @@ export default function MediaKitPage() {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => copyToClipboard(font.name, `font-${font.id}`)}
-                                className="bg-white/10 hover:bg-white/20 text-white p-4 rounded-2xl transition-all duration-300"
+                                className="bg-white/10 hover:bg-white/20 text-white p-3 sm:p-4 rounded-2xl transition-all duration-300"
                               >
                                 {copiedText === `font-${font.id}` ? (
                                   <Check className="w-5 h-5 text-green-400" />

@@ -8,9 +8,7 @@
       "category": "العناوين الرئيسية",
       "weight": "Bold",
       "size": "2.4 MB",
-      "formats": [
-        "TTF"
-      ],
+      "formats": ["TTF"],
       "preview": "الشهداء أحياء عند ربهم يرزقون",
       "description": "خط فاخر مصمم خصيصاً للعناوين الرئيسية والشعارات التذكارية",
       "downloads": 15420,
@@ -37,9 +35,7 @@
       "gradient": "asdda",
       "fontFamily": "sadasd",
       "size": "0.1 MB",
-      "formats": [
-        "TTF"
-      ],
+      "formats": ["TTF"],
       "preview": "الشهداء أحياء عند ربهم يرزقون",
       "rating": 4.5,
       "downloadUrl": "/fonts/alfont_com_adoody (1).ttf"
@@ -54,17 +50,9 @@
       "preview": "/placeholder.svg?height=300&width=200&text=بطاقة+كلاسيكية",
       "description": "تصميم كلاسيكي أنيق للبطاقات التذكارية",
       "downloads": 1250,
-      "formats": [
-        "PSD",
-        "AI",
-        "PNG"
-      ],
+      "formats": ["PSD", "AI", "PNG"],
       "size": "15.2 MB",
-      "tags": [
-        "كلاسيكي",
-        "بطاقة",
-        "تذكاري"
-      ],
+      "tags": ["كلاسيكي", "بطاقة", "تذكاري"],
       "createdAt": "2024-01-10T14:20:00Z",
       "createdBy": "admin"
     },
@@ -77,12 +65,8 @@
       "category": "بوسترات",
       "template": "",
       "description": "s",
-      "formats": [
-        "JPEG"
-      ],
-      "tags": [
-        "s"
-      ],
+      "formats": ["JPEG"],
+      "tags": ["s"],
       "file": {},
       "preview": "/placeholder.svg?height=300&width=200&text=asd",
       "size": "0.1 MB"
@@ -96,17 +80,9 @@
       "preview": "/placeholder.svg?height=400&width=300&text=بوستر+الذكرى",
       "description": "بوستر تذكاري للمناسبات الخاصة",
       "downloads": 890,
-      "formats": [
-        "PSD",
-        "AI",
-        "JPG"
-      ],
+      "formats": ["PSD", "AI", "JPG"],
       "size": "28.7 MB",
-      "tags": [
-        "ذكرى",
-        "بوستر",
-        "مناسبة"
-      ],
+      "tags": ["ذكرى", "بوستر", "مناسبة"],
       "createdAt": "2024-01-08T16:45:00Z",
       "createdBy": "admin"
     }
@@ -119,437 +95,16 @@
       "preview": "/placeholder.svg?height=200&width=200&text=أيقونات",
       "description": "مجموعة من الأيقونات التذكارية",
       "downloads": 2340,
-      "formats": [
-        "SVG",
-        "PNG",
-        "AI"
-      ],
+      "formats": ["SVG", "PNG", "AI"],
       "size": "5.8 MB",
-      "tags": [
-        "أيقونات",
-        "رموز",
-        "تذكاري"
-      ],
+      "tags": ["أيقونات", "رموز", "تذكاري"],
       "createdAt": "2024-01-05T09:15:00Z",
       "createdBy": "admin"
     }
   ],
-  "videos": [
-    {
-      "id": 1,
-      "name": "فيديو تعريفي للأرشيف",
-      "category": "تعريفي",
-      "preview": "/placeholder.svg?height=300&width=400&text=فيديو+تعريفي",
-      "description": "فيديو تعريفي شامل للأرشيف الرقمي",
-      "downloads": 567,
-      "formats": [
-        "MP4",
-        "MOV",
-        "AVI"
-      ],
-      "size": "125 MB",
-      "duration": "3:45",
-      "tags": [
-        "تعريفي",
-        "أرشيف",
-        "شرح"
-      ],
-      "createdAt": "2024-01-03T11:30:00Z",
-      "createdBy": "admin"
-    },
-    {
-      "id": "videos/1755439402183-http___localhost_3000_urls---My-Workspace-2025-01-15-19-33-09.mp4",
-      "name": "http___localhost_3000_urls - My Workspace 2025-01-15 19-33-09",
-      "category": "فيديو تعريفي",
-      "preview": "/placeholder.svg?height=300&width=400&text=فيديو+تعريفي",
-      "description": "فيديو تم رفعه من لوحة الإدارة",
-      "downloads": 0,
-      "formats": [
-        "video/mp4"
-      ],
-      "size": "1.6 MB",
-      "duration": "0:00",
-      "tags": [
-        "فيديو",
-        "مرفوع"
-      ],
-      "createdAt": "2025-08-17T14:03:23.055Z",
-      "createdBy": "admin",
-      "url": "https://martyr-archive-audios-2025.s3.eu-west-1.amazonaws.com/videos/1755439402183-http___localhost_3000_urls---My-Workspace-2025-01-15-19-33-09.mp4",
-      "thumbnail": ""
-    },
-    {
-      "id": "1755949855640-video1.mp4",
-      "name": "video1",
-      "category": "فيديو ترفيهي",
-      "preview": "/placeholder.svg?height=300&width=400&text=فيديو+تعريفي",
-      "description": "s",
-      "downloads": 0,
-      "formats": [
-        "video/mp4"
-      ],
-      "size": "0.4 MB",
-      "duration": "0:00",
-      "tags": [
-        "فيديو",
-        "مرفوع"
-      ],
-      "createdAt": "2025-08-23T11:50:56.793Z",
-      "createdBy": "admin",
-      "url": "https://storage.googleapis.com/local-project-videos/1755949855640-video1.mp4",
-      "thumbnail": ""
-    }
-  ],
-  "audio": [
-    {
-      "id": 1,
-      "name": "موسيقى تصويرية هادئة",
-      "category": "موسيقى",
-      "preview": "/placeholder.svg?height=200&width=300&text=موسيقى+تصويرية",
-      "description": "موسيقى تصويرية هادئة للخلفيات",
-      "downloads": 1890,
-      "formats": [
-        "MP3",
-        "WAV",
-        "FLAC"
-      ],
-      "size": "12.4 MB",
-      "duration": "4:20",
-      "tags": [
-        "موسيقى",
-        "هادئة",
-        "خلفية"
-      ],
-      "createdAt": "2024-01-01T08:00:00Z",
-      "createdBy": "admin"
-    },
-    {
-      "id": "local-1755713357594-yt1z.net---Finance-App-UI-in-React-Native-with-Expo-Router-Tutorial-for-Beginners-2024.mp3",
-      "name": "yt1z.net - Finance App UI in React Native with Expo Router Tutorial for Beginners  2024",
-      "category": "موسيقى",
-      "preview": "/placeholder.svg?height=200&width=300&text=موسيقى+تصويرية",
-      "description": "ملف صوتي (رفع محلي - Supabase غير متاح)",
-      "downloads": 0,
-      "formats": [
-        "audio/mpeg"
-      ],
-      "size": "50.6 MB",
-      "duration": "51:00",
-      "tags": [
-        "موسيقى",
-        "صوتي",
-        "محلي"
-      ],
-      "createdAt": "2025-08-20T18:09:17.595Z",
-      "createdBy": "admin",
-      "url": "/audio/local-1755713357594-yt1z.net---Finance-App-UI-in-React-Native-with-Expo-Router-Tutorial-for-Beginners-2024.mp3",
-      "localFile": true
-    },
-    {
-      "id": "local-1755714803006-yt1z.net---Finance-App-UI-in-React-Native-with-Expo-Router-Tutorial-for-Beginners-2024.mp3",
-      "name": "yt1z.net - Finance App UI in React Native with Expo Router Tutorial for Beginners  2024",
-      "category": "موسيقى",
-      "preview": "/placeholder.svg?height=200&width=300&text=موسيقى+تصويرية",
-      "description": "ملف صوتي (رفع محلي - Supabase غير متاح)",
-      "downloads": 0,
-      "formats": [
-        "audio/mpeg"
-      ],
-      "size": "50.6 MB",
-      "duration": "51:00",
-      "tags": [
-        "موسيقى",
-        "صوتي",
-        "محلي"
-      ],
-      "createdAt": "2025-08-20T18:33:23.007Z",
-      "createdBy": "admin",
-      "url": "/audio/local-1755714803006-yt1z.net---Finance-App-UI-in-React-Native-with-Expo-Router-Tutorial-for-Beginners-2024.mp3",
-      "localFile": true
-    },
-    {
-      "id": "1755949908835-yt1z.net---Finance-App-UI-in-React-Native-with-Expo-Router-Tutorial-for-Beginners-2024.mp3",
-      "name": "yt1z.net---Finance-App-UI-in-React-Native-with-Expo-Router-Tutorial-for-Beginners-2024",
-      "category": "موسيقى",
-      "preview": "/placeholder.svg?height=200&width=300&text=موسيقى+تصويرية",
-      "description": "ملف صوتي تم رفعه من لوحة الإدارة",
-      "downloads": 0,
-      "formats": [
-        "audio/mpeg"
-      ],
-      "size": "50.6 MB",
-      "duration": "51:00",
-      "tags": [
-        "موسيقى",
-        "صوتي",
-        "مرفوع"
-      ],
-      "createdAt": "2025-08-23T11:51:57.936Z",
-      "createdBy": "admin",
-      "url": "https://storage.googleapis.com/local-project-audio/1755949908835-yt1z.net---Finance-App-UI-in-React-Native-with-Expo-Router-Tutorial-for-Beginners-2024.mp3"
-    }
-  ],
+  "videos": [],
+  "audio": [],
   "martyrs": [
-    {
-      "id": 1754732848815,
-      "downloads": 0,
-      "createdAt": "2025-08-09T09:47:28.815Z",
-      "createdBy": "admin",
-      "name": "asdasd",
-      "age": 22,
-      "location": "asdasd",
-      "martyrdomDate": "",
-      "story": "asdasd",
-      "testament": "asdasdasd",
-      "image": "/placeholder.svg?height=400&width=300&text=asdasd",
-      "audioUrl": "/audio/placeholder.mp3"
-    },
-    {
-      "id": 1755696037965,
-      "downloads": 0,
-      "createdAt": "2025-08-20T13:20:37.965Z",
-      "createdBy": "admin",
-      "name": "asdasd",
-      "age": null,
-      "location": "asdasd",
-      "martyrdomDate": "",
-      "story": "asdasdasd",
-      "testament": "asdasd",
-      "image": "/placeholder.svg?height=400&width=300&text=asdasd",
-      "audioUrl": "/audio/placeholder.mp3",
-      "gallery": []
-    },
-    {
-      "id": 1755766578124,
-      "downloads": 0,
-      "createdAt": "2025-08-21T08:56:18.124Z",
-      "createdBy": "admin",
-      "name": "asdasd",
-      "arabicName": "asd",
-      "englishName": "asdasd",
-      "dateOfBirth": "",
-      "placeOfBirth": "asdasd",
-      "martyrdomDate": "2025-08-29",
-      "story": "asdasdsad",
-      "testament": "asd",
-      "profileImage": "/placeholder.svg?height=400&width=300&text=صورة+الشهيد"
-    },
-    {
-      "id": 1755767850907,
-      "downloads": 0,
-      "createdAt": "2025-08-21T09:17:30.907Z",
-      "createdBy": "admin",
-      "name": "asd",
-      "arabicName": "",
-      "englishName": "asdasdasd",
-      "dateOfBirth": "2025-08-11",
-      "placeOfBirth": "asddddddddddd",
-      "martyrdomDate": "2025-08-29",
-      "story": "asdasd",
-      "testament": "d",
-      "profileImage": "/placeholder.svg?height=400&width=300&text=صورة+الشهيد"
-    },
-    {
-      "id": 1755768817883,
-      "downloads": 0,
-      "createdAt": "2025-08-21T09:33:37.883Z",
-      "createdBy": "admin",
-      "name": "sadfdsfsdffdf",
-      "arabicName": "fffff",
-      "englishName": "fffff",
-      "dateOfBirth": "",
-      "placeOfBirth": "f",
-      "martyrdomDate": "2025-08-25",
-      "story": "f",
-      "testament": "f",
-      "profileImage": "/placeholder.svg?height=400&width=300&text=صورة+الشهيد"
-    },
-    {
-      "id": 1755771152658,
-      "downloads": 0,
-      "createdAt": "2025-08-21T10:12:32.658Z",
-      "createdBy": "admin",
-      "name": "ssssssss",
-      "arabicName": "sss",
-      "englishName": "sss",
-      "dateOfBirth": "2025-08-04",
-      "placeOfBirth": "ssssssssssssssss",
-      "martyrdomDate": "2025-08-20",
-      "martyrdomPlace": "sssssssssssssss",
-      "story": "ssss",
-      "testament": "ss",
-      "profileImage": "/placeholder.svg?height=400&width=300&text=صورة+الشهيد",
-      "galleryCount": 0,
-      "audioCount": 0,
-      "documentsCount": 0
-    },
-    {
-      "id": 1755771349786,
-      "downloads": 0,
-      "createdAt": "2025-08-21T10:15:49.786Z",
-      "createdBy": "admin",
-      "name": "ssssssss",
-      "arabicName": "ssss",
-      "englishName": "ss",
-      "dateOfBirth": "2025-08-05",
-      "placeOfBirth": "ss",
-      "martyrdomDate": "2025-08-19",
-      "martyrdomPlace": "sss",
-      "story": "ss",
-      "testament": "s",
-      "profileImage": "/placeholder.svg?height=400&width=300&text=صورة+الشهيد",
-      "galleryCount": 0,
-      "audioCount": 0,
-      "documentsCount": 0
-    },
-    {
-      "id": 1755775179665,
-      "downloads": 0,
-      "createdAt": "2025-08-21T11:19:39.665Z",
-      "createdBy": "admin",
-      "name": "asdasd",
-      "arabicName": "asd",
-      "englishName": "s",
-      "dateOfBirth": "2025-08-06",
-      "placeOfBirth": "s",
-      "martyrdomDate": "2025-08-13",
-      "story": "s",
-      "testament": "s",
-      "profileImage": "/placeholder.svg?height=400&width=300&text=صورة+الشهيد"
-    },
-    {
-      "id": 1755775699713,
-      "downloads": 0,
-      "createdAt": "2025-08-21T11:28:19.713Z",
-      "createdBy": "admin",
-      "name": "asdas",
-      "arabicName": "asd",
-      "englishName": "asd",
-      "dateOfBirth": "2025-08-06",
-      "placeOfBirth": "asd",
-      "martyrdomDate": "2025-08-14",
-      "martyrdomPlace": "asdasd",
-      "story": "asdasd",
-      "testament": "d",
-      "profileImage": "https://storage.googleapis.com/steam-canto-461415-s4-images/1755775702810-profile-1755775700867-b2b646f5-3677-4bd8-b70d-b068aa482a3a-1.jpg",
-      "galleryCount": 0,
-      "audioCount": 0,
-      "documentsCount": 0
-    },
-    {
-      "id": 1755776279241,
-      "downloads": 0,
-      "createdAt": "2025-08-21T11:37:59.241Z",
-      "createdBy": "admin",
-      "name": "w",
-      "arabicName": "w",
-      "englishName": "w",
-      "dateOfBirth": "2025-08-04",
-      "placeOfBirth": "w",
-      "martyrdomDate": "2025-08-22",
-      "martyrdomPlace": "w",
-      "story": "w",
-      "testament": "w",
-      "profileImage": "https://storage.googleapis.com/steam-canto-461415-s4-images/1755776280667-profile-1755776280177-asdas-.png",
-      "galleryCount": 0,
-      "audioCount": 0,
-      "documentsCount": 0
-    },
-    {
-      "id": 1755776337496,
-      "downloads": 0,
-      "createdAt": "2025-08-21T11:38:57.496Z",
-      "createdBy": "admin",
-      "name": "s",
-      "arabicName": "s",
-      "englishName": "s",
-      "dateOfBirth": "2025-08-03",
-      "placeOfBirth": "s",
-      "martyrdomDate": "2025-08-19",
-      "martyrdomPlace": "",
-      "story": "s",
-      "testament": "s",
-      "profileImage": "https://storage.googleapis.com/steam-canto-461415-s4-images/1755776337997-profile-1755776337522-WhatsApp-Image-2025-08-02-at-13.41.52.jpeg",
-      "galleryCount": 0,
-      "audioCount": 0,
-      "documentsCount": 0
-    },
-    {
-      "id": 1755776403201,
-      "downloads": 0,
-      "createdAt": "2025-08-21T11:40:03.201Z",
-      "createdBy": "admin",
-      "name": "s",
-      "arabicName": "s",
-      "englishName": "s",
-      "dateOfBirth": "2025-08-04",
-      "placeOfBirth": "s",
-      "martyrdomDate": "2025-08-07",
-      "martyrdomPlace": "s",
-      "story": "s",
-      "testament": "s",
-      "profileImage": "https://storage.googleapis.com/steam-canto-461415-s4-images/1755776403448-profile-1755776403288-tabbarexample.jpg",
-      "galleryCount": 0,
-      "audioCount": 0,
-      "documentsCount": 0
-    },
-    {
-      "id": 1755780292592,
-      "downloads": 0,
-      "createdAt": "2025-08-21T12:44:52.592Z",
-      "createdBy": "admin",
-      "name": "as",
-      "arabicName": "f",
-      "englishName": "f",
-      "dateOfBirth": "2025-08-04",
-      "placeOfBirth": "f",
-      "martyrdomDate": "2025-09-03",
-      "martyrdomPlace": "f",
-      "story": "f",
-      "testament": "f",
-      "profileImage": "https://storage.googleapis.com/steam-canto-461415-s4-images/1755780294632-profile-1755780294127-discover-1.png",
-      "galleryCount": 0,
-      "audioCount": 0,
-      "documentsCount": 0
-    },
-    {
-      "id": 1755949724872,
-      "downloads": 0,
-      "createdAt": "2025-08-23T11:48:44.872Z",
-      "createdBy": "admin",
-      "name": "asdsad",
-      "arabicName": "asd",
-      "englishName": "asd",
-      "dateOfBirth": "2025-08-05",
-      "placeOfBirth": "asd",
-      "martyrdomDate": "2025-08-27",
-      "martyrdomPlace": "s",
-      "story": "s",
-      "testament": "s",
-      "profileImage": "https://storage.googleapis.com/local-project-images/1755949728635-profile-1755949726678-WhatsApp-Image-2025-08-02-at-13.41.52.jpeg",
-      "galleryCount": 0,
-      "audioCount": 0,
-      "documentsCount": 0
-    },
-    {
-      "id": 1755949790096,
-      "downloads": 0,
-      "createdAt": "2025-08-23T11:49:50.096Z",
-      "createdBy": "admin",
-      "name": "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
-      "arabicName": "qq",
-      "englishName": "q",
-      "dateOfBirth": "2025-08-28",
-      "placeOfBirth": "q",
-      "martyrdomDate": "2025-08-28",
-      "martyrdomPlace": "q",
-      "story": "q",
-      "testament": "q",
-      "profileImage": "https://storage.googleapis.com/local-project-images/1755949790609-profile-1755949790124-rentals-logo-1.jpg",
-      "galleryCount": 0,
-      "audioCount": 0,
-      "documentsCount": 0
-    },
     {
       "id": 1756042551756,
       "downloads": 0,
@@ -561,39 +116,13 @@
       "dateOfBirth": "",
       "placeOfBirth": "asd",
       "martyrdomDate": "2025-08-26",
+      "martyrdomPlace": "",
       "story": "asd",
-      "testament": "s",
-      "profileImage": "/placeholder.svg?height=400&width=300&text=صورة+الشهيد"
-    },
-    {
-      "id": 1756126563946,
-      "downloads": 0,
-      "createdAt": "2025-08-25T12:56:03.946Z",
-      "createdBy": "admin",
-      "name": "s",
-      "arabicName": "s",
-      "englishName": "s",
-      "dateOfBirth": "",
-      "placeOfBirth": "ASDSA",
-      "martyrdomDate": "",
-      "story": "S",
-      "testament": "S",
-      "profileImage": "/placeholder.svg?height=400&width=300&text=صورة+الشهيد"
-    },
-    {
-      "id": 1756130175707,
-      "downloads": 0,
-      "createdAt": "2025-08-25T13:56:15.707Z",
-      "createdBy": "admin",
-      "name": "alialhadi ak",
-      "arabicName": "asd",
-      "englishName": "asd",
-      "dateOfBirth": "",
-      "placeOfBirth": "s",
-      "martyrdomDate": "",
-      "story": "s",
-      "testament": "s",
-      "profileImage": "/placeholder.svg?height=400&width=300&text=صورة+الشهيد"
+      "testament": "asd",
+      "profileImage": "/placeholder.svg?height=400&width=300&text=صورة+الشهيد",
+      "galleryCount": 0,
+      "audioCount": 0,
+      "documentsCount": 0
     }
   ]
 }

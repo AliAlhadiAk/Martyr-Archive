@@ -1,32 +1,81 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    // Skip lint errors during production build
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    // Skip type errors during production build
-    ignoreBuildErrors: true,
-  },
+  // Image optimization
   images: {
-    // Keep unoptimized to avoid server optimization overhead
-    unoptimized: true,
-    // Allow Supabase storage images
-    remotePatterns: [
+    formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
+  },
+
+  // Compression and optimization
+  compress: true,
+  poweredByHeader: false,
+
+  // Headers for better caching and performance
+  async headers() {
+    return [
       {
-        protocol: 'https',
-        hostname: '*.supabase.co',
-        pathname: '/storage/v1/object/public/**',
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+        ],
       },
-      // Keep S3 for backward compatibility during migration
-      ...(process.env.AWS_BUCKET_NAME && process.env.AWS_REGION ? [
-        {
-          protocol: 'https',
-          hostname: `${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com`,
-          pathname: '/**',
+      {
+        source: '/api/martyrs/landing',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=300, stale-while-revalidate=600',
+          },
+        ],
+      },
+      {
+        source: '/api/martyrs/search',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=120, stale-while-revalidate=300',
+          },
+        ],
+      },
+    ]
+  },
+
+  // Webpack optimizations
+  webpack: (config, { dev, isServer }) => {
+    // Optimize bundle size
+    if (!dev && !isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            chunks: 'all',
+            enforce: true,
+          },
         },
-      ] : []),
-    ],
+      }
+    }
+
+    return config
   },
 }
 

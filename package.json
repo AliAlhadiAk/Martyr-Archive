@@ -7,7 +7,9 @@
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
-    "migrate:s3-to-supabase": "node scripts/migrate-s3-to-supabase.js"
+    "migrate:s3-to-supabase": "node scripts/migrate-s3-to-supabase.js",
+    "migrate:jsonbin": "node scripts/migrate-jsonbin.js",
+    "jsonbin:add-martyr": "node scripts/jsonbin-add-martyr.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.864.0",

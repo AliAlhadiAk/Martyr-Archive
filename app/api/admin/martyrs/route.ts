@@ -3,48 +3,66 @@ import { martyrService, type MartyrPersonalInfo, type MartyrFamilyInfo, type Mar
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData()
+    const contentType = req.headers.get('content-type') || ''
+    let formData: FormData | null = null
+    let body: any = null
+
+    if (contentType.includes('application/json')) {
+      body = await req.json()
+    } else {
+      formData = await req.formData()
+    }
     
     // Extract basic information
-    const name = formData.get('name') as string
-    const arabicName = formData.get('arabicName') as string
-    const englishName = formData.get('englishName') as string
-    const dateOfBirth = formData.get('dateOfBirth') as string
-    const placeOfBirth = formData.get('placeOfBirth') as string
-    const nationality = formData.get('nationality') as string
-    const martyrdomDate = formData.get('martyrdomDate') as string
-    const martyrdomPlace = formData.get('martyrdomPlace') as string
-    const martyrdomCircumstances = formData.get('martyrdomCircumstances') as string
+    const name = formData ? (formData.get('name') as string) : (body?.name as string)
+    const arabicName = formData ? (formData.get('arabicName') as string) : (body?.arabicName as string)
+    const englishName = formData ? (formData.get('englishName') as string) : (body?.englishName as string)
+    const dateOfBirth = formData ? (formData.get('dateOfBirth') as string) : (body?.dateOfBirth as string)
+    const placeOfBirth = formData ? (formData.get('placeOfBirth') as string) : (body?.placeOfBirth as string)
+    const nationality = formData ? (formData.get('nationality') as string) : (body?.nationality as string)
+    const martyrdomDate = formData ? (formData.get('martyrdomDate') as string) : (body?.martyrdomDate as string)
+    const martyrdomPlace = formData ? (formData.get('martyrdomPlace') as string) : (body?.martyrdomPlace as string)
+    const martyrdomCircumstances = formData ? (formData.get('martyrdomCircumstances') as string) : (body?.martyrdomCircumstances as string)
     
     // Family information
-    const fatherName = formData.get('fatherName') as string
-    const motherName = formData.get('motherName') as string
-    const siblings = (formData.get('siblings') as string)?.split(',').map(s => s.trim()).filter(Boolean) || []
-    const spouse = formData.get('spouse') as string || null
-    const children = (formData.get('children') as string)?.split(',').map(s => s.trim()).filter(Boolean) || []
+    const fatherName = formData ? (formData.get('fatherName') as string) : (body?.fatherName as string)
+    const motherName = formData ? (formData.get('motherName') as string) : (body?.motherName as string)
+    const siblings = formData
+      ? ((formData.get('siblings') as string)?.split(',').map(s => s.trim()).filter(Boolean) || [])
+      : (Array.isArray(body?.siblings) ? body.siblings : (typeof body?.siblings === 'string' ? body.siblings.split(',').map((s: string) => s.trim()).filter(Boolean) : []))
+    const spouse = formData ? ((formData.get('spouse') as string) || null) : (body?.spouse ?? null)
+    const children = formData
+      ? ((formData.get('children') as string)?.split(',').map(s => s.trim()).filter(Boolean) || [])
+      : (Array.isArray(body?.children) ? body.children : (typeof body?.children === 'string' ? body.children.split(',').map((s: string) => s.trim()).filter(Boolean) : []))
     
     // Biography information
-    const education = formData.get('education') as string
-    const occupation = formData.get('occupation') as string
-    const achievements = (formData.get('achievements') as string)?.split(',').map(s => s.trim()).filter(Boolean) || []
-    const interests = (formData.get('interests') as string)?.split(',').map(s => s.trim()).filter(Boolean) || []
-    const testament = formData.get('testament') as string
+    const education = formData ? (formData.get('education') as string) : (body?.education as string)
+    const occupation = formData ? (formData.get('occupation') as string) : (body?.occupation as string)
+    const achievements = formData
+      ? ((formData.get('achievements') as string)?.split(',').map(s => s.trim()).filter(Boolean) || [])
+      : (Array.isArray(body?.achievements) ? body.achievements : (typeof body?.achievements === 'string' ? body.achievements.split(',').map((s: string) => s.trim()).filter(Boolean) : []))
+    const interests = formData
+      ? ((formData.get('interests') as string)?.split(',').map(s => s.trim()).filter(Boolean) || [])
+      : (Array.isArray(body?.interests) ? body.interests : (typeof body?.interests === 'string' ? body.interests.split(',').map((s: string) => s.trim()).filter(Boolean) : []))
+    const testament = formData ? (formData.get('testament') as string) : (body?.testament as string)
     
     // Tags
-    const tags = (formData.get('tags') as string)?.split(',').map(s => s.trim()).filter(Boolean) || []
+    const tags = formData
+      ? ((formData.get('tags') as string)?.split(',').map(s => s.trim()).filter(Boolean) || [])
+      : (Array.isArray(body?.tags) ? body.tags : (typeof body?.tags === 'string' ? body.tags.split(',').map((s: string) => s.trim()).filter(Boolean) : []))
     
     // Media files
-    const profileImage = formData.get('profileImage') as File | null
-    const galleryFiles = formData.getAll('gallery') as File[]
-    const videoFiles = formData.getAll('videos') as File[]
-    const audioFiles = formData.getAll('audio') as File[]
-    const documentFiles = formData.getAll('documents') as File[]
+    const profileImage = formData ? (formData.get('profileImage') as File | null) : null
+    const galleryFiles = formData ? (formData.getAll('gallery') as File[]) : []
+    const videoFiles = formData ? (formData.getAll('videos') as File[]) : []
+    const audioFiles = formData ? (formData.getAll('audio') as File[]) : []
+    const documentFiles = formData ? (formData.getAll('documents') as File[]) : []
     
-    // Validation
-    if (!name || !arabicName || !englishName || !dateOfBirth || !martyrdomDate) {
+    // Validation (relaxed to reduce 400s; only essential fields required)
+    if (!name || !martyrdomDate) {
       return NextResponse.json({ 
         error: 'Missing required fields',
-        required: ['name', 'arabicName', 'englishName', 'dateOfBirth', 'martyrdomDate']
+        required: ['name', 'martyrdomDate']
       }, { status: 400 })
     }
 
@@ -123,8 +141,8 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
-    const martyrs = martyrService.getAllMartyrs()
-    const stats = martyrService.getStatisticsSummary()
+    const martyrs = await martyrService.getAllMartyrs()
+    const stats = await martyrService.getStatisticsSummary()
     
     return NextResponse.json({
       martyrs: martyrs.map(martyr => ({

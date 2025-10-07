@@ -1,3 +1,15 @@
+import { NextResponse } from 'next/server'
+import { martyrService } from '@/lib/martyr-service'
+
+export async function GET() {
+  try {
+    const stats = await martyrService.getStatisticsSummary()
+    return NextResponse.json(stats)
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message || 'failed' }, { status: 500 })
+  }
+}
+
 import fs from 'fs'
 import path from 'path'
 

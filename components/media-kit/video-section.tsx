@@ -20,6 +20,11 @@ interface VideoFile {
   createdAt?: string
   premium?: boolean
   thumbnail?: string
+  martyrId?: string
+  martyrName?: string
+  martyrImage?: string
+  martyrdomDate?: string
+  tags?: string[]
 }
 
 export function VideoSection({ videoFiles }: { videoFiles: VideoFile[] }) {
@@ -140,32 +145,49 @@ export function VideoSection({ videoFiles }: { videoFiles: VideoFile[] }) {
       <h2 className="text-2xl font-bold text-white mb-6 font-mj-ghalam">
         ملفات الفيديو
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {videoFiles.map((video) => (
           <Card key={video.id} className="bg-white/5 border-white/10 hover:bg-white/10 transition-colors">
             <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="text-lg text-white font-dg-mataryah line-clamp-2">
-                    {video.title}
-                  </CardTitle>
-                  {video.premium && (
-                    <Badge className="mt-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
-                      <Star className="w-3 h-3 mr-1" />
-                      مميز
-                    </Badge>
-                  )}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-white/10 flex-shrink-0">
+                    {video.martyrImage ? (
+                      <img src={video.martyrImage} alt={video.martyrName || video.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <CardTitle className="text-base text-white font-dg-mataryah line-clamp-2">
+                      {video.martyrName || video.title}
+                    </CardTitle>
+                    <div className="text-white/60 text-xs truncate">{video.martyrdomDate || ''}</div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-1 text-white/60 text-sm">
                   <Clock className="w-4 h-4" />
                   <span>{video.duration}</span>
                 </div>
               </div>
+              {video.premium && (
+                <Badge className="mt-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
+                  <Star className="w-3 h-3 mr-1" />
+                  مميز
+                </Badge>
+              )}
               
               {video.category && (
                 <Badge variant="outline" className="text-white/80 border-white/20">
                   {video.category}
                 </Badge>
+              )}
+              {video.tags && video.tags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {video.tags.slice(0, 3).map((tag) => (
+                    <span key={tag} className="px-2 py-0.5 rounded-md bg-white/10 text-white/70 text-xs">{tag}</span>
+                  ))}
+                </div>
               )}
             </CardHeader>
 
