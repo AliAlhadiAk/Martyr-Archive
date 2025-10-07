@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 // If you have this service, keep it:
-import { martyrService } from '@/services/martyrService' // adjust path if needed
+import { martyrService } from '@/lib/martyr-service' // adjust path if needed
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
