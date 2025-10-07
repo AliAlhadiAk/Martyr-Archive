@@ -534,4 +534,3 @@ export class MartyrService {
 
 // Export singleton instance
 export const martyrService = new MartyrService()
-

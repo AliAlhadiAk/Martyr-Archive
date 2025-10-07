@@ -129,6 +129,17 @@ const [activeTab, setActiveTab] = useState<TabKey>('overview')
 		audio.volume = isMuted ? 0 : volume
 	}, [volume, isMuted])
 
+	const togglePlay = useCallback(() => {
+		const audio = audioRef.current
+		if (!audio) return
+		if (isPlaying) {
+			audio.pause()
+			setIsPlaying(false)
+		} else {
+			audio.play().then(() => setIsPlaying(true)).catch(() => {})
+		}
+	}, [isPlaying])
+
 	useEffect(() => {
 		const onKey = (e: KeyboardEvent) => {
 			if (e.key === ' ') {
@@ -142,18 +153,7 @@ const [activeTab, setActiveTab] = useState<TabKey>('overview')
 		}
 		window.addEventListener('keydown', onKey)
 		return () => window.removeEventListener('keydown', onKey)
-	}, [hasAudio])
-
-	const togglePlay = useCallback(() => {
-		const audio = audioRef.current
-		if (!audio) return
-		if (isPlaying) {
-			audio.pause()
-			setIsPlaying(false)
-		} else {
-			audio.play().then(() => setIsPlaying(true)).catch(() => {})
-		}
-	}, [isPlaying])
+	}, [hasAudio, togglePlay])
 
 	const onSeek = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		const audio = audioRef.current
@@ -376,9 +376,9 @@ const [activeTab, setActiveTab] = useState<TabKey>('overview')
 												{isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
 											</Button>
 											<Button variant="ghost" size="icon" onClick={toggleMute} aria-label={isMuted ? 'إلغاء كتم الصوت' : 'كتم الصوت'}>
-												{isMuted || volume === 0 ? <VolumeX className="w-5 h-5 text:white/70" /> : <Volume2 className="w-5 h-5 text-white/70" />}
+												{isMuted || volume === 0 ? <VolumeX className="w-5 h-5 text-white/70" /> : <Volume2 className="w-5 h-5 text-white/70" />}
 											</Button>
-											<div className="flex items:center gap-2 w-40">
+											<div className="flex items-center gap-2 w-40">
 												<input type="range" min={0} max={1} step={0.01} value={isMuted ? 0 : volume} onChange={onVolumeChange} className="w-full accent-red-500" aria-label="مستوى الصوت" />
 											</div>
 											<div className="flex-1" />
@@ -469,7 +469,7 @@ const [activeTab, setActiveTab] = useState<TabKey>('overview')
 						{activeTab === 'related' && (
 							<Card className="bg-white/5 border-white/10">
 								<CardContent className="p-6 space-y-4">
-									<h2 className="text-xl font-semibold text:white font-mj-ghalam">شخصيات مرتبطة</h2>
+									<h2 className="text-xl font-semibold text-white font-mj-ghalam">شخصيات مرتبطة</h2>
 									{related.length > 0 ? (
 										<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
 											{related.map((m) => (

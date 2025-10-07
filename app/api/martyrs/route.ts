@@ -1,20 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { martyrService } from '@/lib/martyr-service'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+// Simple in-memory cache (reset on server restart)
+let cachedMartyrs: any[] | null = null
+let lastFetch = 0
+const CACHE_TTL = 60 * 1000 // 1 minute
 
 export async function GET(req: NextRequest) {
   try {
-    const martyrs = martyrService.getAllMartyrs()
-    const list = martyrs.map((m) => ({
+    const now = Date.now()
+    if (cachedMartyrs && now - lastFetch < CACHE_TTL) {
+      return NextResponse.json({ martyrs: cachedMartyrs })
+    }
+
+    const { data, error } = await supabase
+      .from('martyrs')
+      .select('*')
+      .order('martyrdom_date', { ascending: false })
+
+    if (error) throw error
+
+    const list = (data ?? []).map((m) => ({
       id: m.id,
-      name: m.personalInfo.name,
-      age: m.personalInfo.age,
-      location: m.personalInfo.martyrdomPlace || m.personalInfo.placeOfBirth,
-      martyrdomDate: m.personalInfo.martyrdomDate,
-      image: m.mediaAssets.profileImage?.url || "/placeholder.svg?height=400&width=300&text=صورة+الشهيد",
-      story: '',
-      testament: m.biography.testament,
-      audioUrl: m.mediaAssets.audio[0]?.url,
+      name: m.name,
+      age: m.age,
+      location: m.location,
+      martyrdomDate: m.martyrdom_date,
+      image: m.image_url || "/placeholder.svg?height=400&width=300&text=صورة+الشهيد",
+      story: m.story || '',
+      testament: m.testament || '',
+      audioUrl: m.audio_url || '',
+      tags: m.tags || [],
     }))
+
+    cachedMartyrs = list
+    lastFetch = now
+
     return NextResponse.json({ martyrs: list })
   } catch (error: any) {
     console.error('API Error:', error)
@@ -24,7 +50,3 @@ export async function GET(req: NextRequest) {
     )
   }
 }
-
-// POST, PUT, DELETE methods for martyrs would typically be handled by the admin API,
-// but if direct manipulation is needed, they would go here.
-// For now, we rely on the /api/admin/assets endpoint for CUD operations.

@@ -1,6 +1,8 @@
 import { Storage } from '@google-cloud/storage'
 import path from 'path'
 import fs from 'fs'
+import { createClient } from '@supabase/supabase-js'
+import martyrsJson from '../data/martyrs.json' assert { type: 'json' }
 
 // Buckets we use (create these in your GCP project or let code create them)
 export const STORAGE_BUCKETS = {
@@ -187,3 +189,4 @@ export async function downloadFile(bucket: StorageBucket, key: string): Promise<
     throw new Error('Failed to download file')
   }
 }
+
