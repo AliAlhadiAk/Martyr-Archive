@@ -153,7 +153,7 @@ const [activeTab, setActiveTab] = useState<TabKey>('overview')
 		}
 		window.addEventListener('keydown', onKey)
 		return () => window.removeEventListener('keydown', onKey)
-	}, [hasAudio, togglePlay])
+	}, [hasAudio, togglePlay])//
 
 	const onSeek = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		const audio = audioRef.current
